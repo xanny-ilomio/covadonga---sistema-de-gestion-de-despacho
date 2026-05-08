@@ -1,0 +1,26 @@
+services:
+  frontend:
+    image: node:20
+    working_dir: /app
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+    command: npm run dev -- --host
+
+  backend:
+    image: php:8.4-apache
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www/html
+  db:
+    image: mariadb:10.11
+    environment:
+      MYSQL_ROOT_PASSWORD: ${sql_pass}
+      MYSQL_DATABASE: ${sql_namedb}
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
