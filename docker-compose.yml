@@ -15,10 +15,15 @@ services:
     volumes:
       - ./backend:/var/www/html
   db:
-    image: mariadb:10.11
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${sql_pass}
       MYSQL_DATABASE: ${sql_namedb}
+      MYSQL_USER: ${sql_user}
+    ports:
+      - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
 
