@@ -8,14 +8,14 @@ class AuthController{
 
     public function login(): void{
         #se lee el json enviado desde el body de la petcion
-        $body = json_encode(file_get_contents('php://input'), true);
+        $body = json_decode(file_get_contents('php://input'), true);
 
         #extrae y limpiar caampos
-        $username = trim($body['username']??'');
-        $password = trim($body['password']??'');
+        $username = trim($body['username'] ?? '');
+        $password = trim($body['password'] ?? '');
 
         #validar que se recibieron ambos
-        if(empty($username)||empty($password)){
+        if(empty($username) || empty($password)){
             Response::error('Username y contraseña requeridos', 422);
         }
 
@@ -34,7 +34,7 @@ class AuthController{
         #estaran disponibles en cada request sin tener que consultar a bd
         $token = JWTHelper::generate([
             'user_id' => $user['ID_USER'],
-            'username' => $username['USERNAME'],
+            'username' => $user['USERNAME'],
             'rol' => $user['ROL'],
         ]);
 
@@ -43,7 +43,7 @@ class AuthController{
             'token'=>$token,
             'user'=>[
                 'id'=> $user['ID_USER'],
-                'username' => $username['USERNAME'],
+                'username' => $user['USERNAME'],
                 'rol' => $user['ROL'],
             ],
         ], 'Login exitoso');
