@@ -16,24 +16,23 @@ $basePath = '/var/www/backend/src/';
 
 
 $classMap=[
-    #Config
-    'Database'        => $basePath . 'config/database.php',
-    #Helpers
-    'Response'        => $basePath . 'helpers/Response.php',
-    'JWTHelper'       => $basePath . 'helpers/JWTHelper.php',
-    #Middleware
-    'AuthMiddleware'  => $basePath . 'middleware/AuthMiddleware.php',
-    #Models
-    'User'            => $basePath . 'models/User.php',
-    'Client'          => $basePath . 'models/Client.php',
-    'Product'         => $basePath . 'models/Product.php',
-    'Order'           => $basePath . 'models/Order.php',
-    #Controllers
+    'Database'          => $basePath . 'config/database.php',
+    'Response'          => $basePath . 'helpers/Response.php',
+    'JWTHelper'         => $basePath . 'helpers/JWTHelper.php',
+    'AuthMiddleware'    => $basePath . 'middleware/AuthMiddleware.php',
+    'User'              => $basePath . 'models/User.php',
+    'Client'            => $basePath . 'models/Client.php',
+    'Product'           => $basePath . 'models/Product.php',
+    'Order'             => $basePath . 'models/Order.php',
+    'Guide'             => $basePath . 'models/Guide.php',
     'AuthController'    => $basePath . 'controllers/AuthController.php',
     'UserController'    => $basePath . 'controllers/UserController.php',
     'ClientController'  => $basePath . 'controllers/ClientController.php',
+    'CityController'    => $basePath . 'controllers/CityController.php',
     'ProductController' => $basePath . 'controllers/ProductController.php',
     'OrderController'   => $basePath . 'controllers/OrderController.php',
+    'RouteController'   => $basePath . 'controllers/RouteController.php',
+    'GuideController'   => $basePath . 'controllers/GuideController.php',
 ];
 
 spl_autoload_register(function (string $class) use ($classMap){
@@ -73,21 +72,43 @@ match(true) {
     $resource === 'clients' && $method === 'POST'                  => (new ClientController())->store(),
     $resource === 'clients' && $method === 'PUT'  && $id !== null  => (new ClientController())->update($id),
     $resource === 'clients' && $method === 'DELETE' && $id !== null => (new ClientController())->destroy($id),
+
+    // Cities — solo lectura, para el dropdown al registrar clientes
+    $resource === 'cities' && $method === 'GET' => (new CityController())->index(),
+
+    // States — para que despacho pueda asignarlos a rutas
+    $resource === 'states' && $method === 'GET' => (new RouteController())->states(),
  
-    // Products
-    $resource === 'products' && $method === 'GET'  && $id === null => (new ProductController())->index(),
-    $resource === 'products' && $method === 'GET'  && $id !== null => (new ProductController())->show($id),
-    $resource === 'products' && $method === 'POST'                  => (new ProductController())->store(),
-    $resource === 'products' && $method === 'PUT'  && $id !== null  => (new ProductController())->update($id),
+     // Products
+    $resource === 'products' && $method === 'GET'    && $id === null => (new ProductController())->index(),
+    $resource === 'products' && $method === 'GET'    && $id !== null => (new ProductController())->show($id),
+    $resource === 'products' && $method === 'POST'                   => (new ProductController())->store(),
+    $resource === 'products' && $method === 'PUT'    && $id !== null => (new ProductController())->update($id),
     $resource === 'products' && $method === 'DELETE' && $id !== null => (new ProductController())->destroy($id),
  
     // Orders
-    $resource === 'orders' && $method === 'GET'  && $id === null   => (new OrderController())->index(),
-    $resource === 'orders' && $method === 'GET'  && $id !== null   => (new OrderController())->show($id),
-    $resource === 'orders' && $method === 'POST'                    => (new OrderController())->store(),
+    $resource === 'orders' && $method === 'GET'  && $id === null => (new OrderController())->index(),
+    $resource === 'orders' && $method === 'GET'  && $id !== null => (new OrderController())->show($id),
+    $resource === 'orders' && $method === 'POST'                  => (new OrderController())->store(),
+    $resource === 'orders' && $method === 'PUT'  && $id !== null && $subResource === 'weights'
+        => (new OrderController())->updateWeights($id),
     $resource === 'orders' && $method === 'PUT'  && $id !== null && $subResource === 'status'
         => (new OrderController())->updateStatus($id),
  
+    // Routes
+    $resource === 'routes' && $method === 'GET'  && $id === null => (new RouteController())->index(),
+    $resource === 'routes' && $method === 'GET'  && $id !== null => (new RouteController())->show($id),
+    $resource === 'routes' && $method === 'POST'                  => (new RouteController())->store(),
+    $resource === 'routes' && $method === 'PUT'  && $id !== null && $subResource === null
+        => (new RouteController())->update($id),
+    $resource === 'routes' && $method === 'PUT'  && $id !== null && $subResource === 'assign-state'
+        => (new RouteController())->assignState($id),
+ 
+    // Guides
+    $resource === 'guides' && $method === 'GET'  && $id === null => (new GuideController())->index(),
+    $resource === 'guides' && $method === 'GET'  && $id !== null => (new GuideController())->show($id),
+    $resource === 'guides' && $method === 'POST'                  => (new GuideController())->store(),
+
     // Ruta no encontrada
     default => Response::notFound("Ruta [{$method} /{$resource}] no existe"),
 };
