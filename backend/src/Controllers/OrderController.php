@@ -29,7 +29,7 @@ class OrderController{
     #Body: { "client_id": 1, "items": [{ "product_id": 1, "amount": 2 }] }
     public function store(): void{
         $authUser = AuthMiddleware::handle();
-        if ($authUser!=='facturacion'){
+        if ($authUser['rol']!== 'facturacion'){
             Response::forbidden('Solo facturacion puede crear pedidos');
         }
 
@@ -80,9 +80,8 @@ class OrderController{
     #aqui SI se le asigna la ruta y cambia a ASIGANDO
     #Body: { "items": [{ "id_op": 1, "weight_real": 12.5 }] }
     public function updateWeights(int $id): void{
-
-        $authUser= authMiddleware::handle();
-        if($authUser!=='despacho'){
+        $authUser= AuthMiddleware::handle();
+        if($authUser['rol']!=='despacho'){
             Response::forbidden('Solo despacho puede actualizar el pedido');
         }
     

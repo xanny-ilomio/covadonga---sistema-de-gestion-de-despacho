@@ -127,7 +127,7 @@ class Client{
             return false;
         }
 
-        $sql = "UPDATE CLIENT SET " . implode(', ', $fields) . "WHERE ID_CLIENT = :id";
+        $sql = "UPDATE CLIENT SET " . implode(', ', $fields) . " WHERE ID_CLIENT = :id";
         $stmt = $this->db->prepare($sql);
         $stmt -> execute($params);
         return $stmt->rowCount()>0;

@@ -131,29 +131,34 @@ class Guide {
     public function create(int $routeId, int $driverId, int $truckId): int {
         $this->db->beginTransaction();
         try {
-            #pedidod asignados
+            // Obtener pedidos asignados a esta ruta
             $orders = $this->getAssignedOrdersByRoute($routeId);
+
             if (empty($orders)) {
                 throw new Exception('No hay pedidos asignados a esta ruta para despachar');
             }
-           #suma de peso all pedidos
+
+            // Sumar el peso real total de todos los pedidos
             $totalWeight = array_sum(array_column($orders, 'WEIGHT_REAL'));
+
+            // Generar número de guía correlativo
             $guideNumber = $this->generateGuideNumber();
 
-            #guia como tal
+            // Insertar la guía
             $stmt = $this->db->prepare("
                 INSERT INTO GUIDE (GUIDE_NUMBER, EMISSION_DATE, TOTAL_WEIGHT, ROUTE_FK, DRIVER_FK, TRUCK_FK)
                 VALUES (:guide_number, CURDATE(), :total_weight, :route_id, :driver_id, :truck_id)
             ");
             $stmt->execute([
-                ':guide_number'=> $guideNumber,
+                ':guide_number' => $guideNumber,
                 ':total_weight' => $totalWeight,
-                ':route_id' => $routeId,
-                ':driver_id'=> $driverId,
-                ':truck_id'=> $truckId,
+                ':route_id'     => $routeId,
+                ':driver_id'    => $driverId,
+                ':truck_id'     => $truckId,
             ]);
             $guideId = (int) $this->db->lastInsertId();
-            #link pedido a guia y estado de despachado
+
+            // Vincular cada pedido a la guía y marcarlo como Despachado
             $stmtLink = $this->db->prepare("
                 INSERT INTO GUIDE_ORDER (GUIDE_FK, ORDER_FK) VALUES (:guide_id, :order_id)
             ");
@@ -165,8 +170,10 @@ class Guide {
                 $stmtLink->execute([':guide_id' => $guideId, ':order_id' => $order['ID_ORDER']]);
                 $stmtStatus->execute([':order_id' => $order['ID_ORDER']]);
             }
+
             $this->db->commit();
             return $guideId;
+
         } catch (Exception $e) {
             $this->db->rollBack();
             throw $e;

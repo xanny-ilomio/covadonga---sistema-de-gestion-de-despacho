@@ -25,6 +25,8 @@ $classMap=[
     'Product'           => $basePath . 'models/Product.php',
     'Order'             => $basePath . 'models/Order.php',
     'Guide'             => $basePath . 'models/Guide.php',
+    'Truck'            => $basePath . 'models/Truck.php',
+    'Driver'           => $basePath . 'models/Driver.php',
     'AuthController'    => $basePath . 'controllers/AuthController.php',
     'UserController'    => $basePath . 'controllers/UserController.php',
     'ClientController'  => $basePath . 'controllers/ClientController.php',
@@ -33,6 +35,8 @@ $classMap=[
     'OrderController'   => $basePath . 'controllers/OrderController.php',
     'RouteController'   => $basePath . 'controllers/RouteController.php',
     'GuideController'   => $basePath . 'controllers/GuideController.php',
+    'TruckController'  => $basePath . 'controllers/TruckController.php',
+    'DriverController' => $basePath . 'controllers/DriverController.php',
 ];
 
 spl_autoload_register(function (string $class) use ($classMap){
@@ -75,6 +79,7 @@ match(true) {
 
     // Cities — solo lectura, para el dropdown al registrar clientes
     $resource === 'cities' && $method === 'GET' => (new CityController())->index(),
+    $resource === 'cities' && $method === 'POST' => (new CityController())->store(),
 
     // States — para que despacho pueda asignarlos a rutas
     $resource === 'states' && $method === 'GET' => (new RouteController())->states(),
@@ -108,6 +113,20 @@ match(true) {
     $resource === 'guides' && $method === 'GET'  && $id === null => (new GuideController())->index(),
     $resource === 'guides' && $method === 'GET'  && $id !== null => (new GuideController())->show($id),
     $resource === 'guides' && $method === 'POST'                  => (new GuideController())->store(),
+
+    // Trucks
+    $resource === 'trucks' && $method === 'GET'    && $id === null => (new TruckController())->index(),
+    $resource === 'trucks' && $method === 'GET'    && $id !== null => (new TruckController())->show($id),
+    $resource === 'trucks' && $method === 'POST'                   => (new TruckController())->store(),
+    $resource === 'trucks' && $method === 'PUT'    && $id !== null => (new TruckController())->update($id),
+    $resource === 'trucks' && $method === 'DELETE' && $id !== null => (new TruckController())->destroy($id),
+    
+    // Drivers
+    $resource === 'drivers' && $method === 'GET'    && $id === null => (new DriverController())->index(),
+    $resource === 'drivers' && $method === 'GET'    && $id !== null => (new DriverController())->show($id),
+    $resource === 'drivers' && $method === 'POST'                   => (new DriverController())->store(),
+    $resource === 'drivers' && $method === 'PUT'    && $id !== null => (new DriverController())->update($id),
+    $resource === 'drivers' && $method === 'DELETE' && $id !== null => (new DriverController())->destroy($id),
 
     // Ruta no encontrada
     default => Response::notFound("Ruta [{$method} /{$resource}] no existe"),
