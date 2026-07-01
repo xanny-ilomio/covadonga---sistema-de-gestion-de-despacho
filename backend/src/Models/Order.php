@@ -11,7 +11,7 @@ class Order {
         $where = $status ? "WHERE O.STATUS = :status" : "";
         $stmt= $this->db->prepare("
             SELECT
-                O.ID_ORDER, O.DATE_ORDERED,O.WEIGHT,
+                O.ID_ORDER, O.DATE_ORDERED,O.WEIGHT, O.UPDATED_AT, 
                 O.WEIGHT_REAL,O.STATUS,C.ID_CLIENT,
                 C.NAME_CLIENT,C.RIF,R.ID_ROUTE,R.NAME_ROUTE
             FROM ORDERS O

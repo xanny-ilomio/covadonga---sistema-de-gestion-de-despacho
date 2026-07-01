@@ -32,11 +32,13 @@ $classMap=[
     'ClientController'  => $basePath . 'controllers/ClientController.php',
     'CityController'    => $basePath . 'controllers/CityController.php',
     'ProductController' => $basePath . 'controllers/ProductController.php',
+    'OrderPdfController' => $basePath . 'controllers/OrderPdfController.php',
     'OrderController'   => $basePath . 'controllers/OrderController.php',
     'RouteController'   => $basePath . 'controllers/RouteController.php',
     'GuideController'   => $basePath . 'controllers/GuideController.php',
     'TruckController'  => $basePath . 'controllers/TruckController.php',
     'DriverController' => $basePath . 'controllers/DriverController.php',
+    'StatsController'   => $basePath . 'controllers/StatsController.php',
 ];
 
 spl_autoload_register(function (string $class) use ($classMap){
@@ -66,6 +68,7 @@ match(true) {
     // Auth — única ruta sin middleware
     $resource === 'auth' && $parts[1] === 'login' && $method === 'POST'
         => (new AuthController())->login(),
+
  
     // Users
     $resource === 'users' && $method === 'GET' && $id !== null => (new UserController())->show($id),
@@ -91,6 +94,10 @@ match(true) {
     $resource === 'products' && $method === 'PUT'    && $id !== null => (new ProductController())->update($id),
     $resource === 'products' && $method === 'DELETE' && $id !== null => (new ProductController())->destroy($id),
  
+    // PDF de pedido individual
+    $resource === 'orders' && $method === 'GET' && $id !== null && $subResource === 'pdf'
+    => (new OrderPdfController())->pdf($id),
+
     // Orders
     $resource === 'orders' && $method === 'GET'  && $id === null => (new OrderController())->index(),
     $resource === 'orders' && $method === 'GET'  && $id !== null => (new OrderController())->show($id),
@@ -127,6 +134,14 @@ match(true) {
     $resource === 'drivers' && $method === 'POST'                   => (new DriverController())->store(),
     $resource === 'drivers' && $method === 'PUT'    && $id !== null => (new DriverController())->update($id),
     $resource === 'drivers' && $method === 'DELETE' && $id !== null => (new DriverController())->destroy($id),
+
+    // Stats
+    $resource === 'stats' && $method === 'GET' => (new StatsController())->index(),
+
+    // Guides PDF
+    $resource === 'guides' && $method === 'GET' && $id !== null && $subResource === 'pdf'
+        => (new GuideController())->pdf($id),
+
 
     // Ruta no encontrada
     default => Response::notFound("Ruta [{$method} /{$resource}] no existe"),
