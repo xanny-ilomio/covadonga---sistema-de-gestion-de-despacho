@@ -18,8 +18,9 @@
 }
 
 :root {
-  --bg: #fcfcfd;
-  --red:#E53027;
+  --bg: #FCFCFD;
+  --red:#b91c1c;
+  --ocre: #AA8847;
 
   --heading: 'Reins';
   --text: 'Nexa';
@@ -80,12 +81,12 @@ h2 {
     font-size: 20px;
   }
 }
-p, input, button, span {
+p, input, button, span, td {
   margin: 0;
   font-family: var(--text);
 }
 
-label{
+label, th{
   font-family: var(--text-b);
 }
 

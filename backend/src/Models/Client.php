@@ -11,7 +11,7 @@ class Client{
         $stmt=$this->db->prepare("
             SELECT
                 C.ID_CLIENT, C.NAME_CLIENT, C.RIF,
-                C.PHONE_CLIENT, C.EMAIL_CLIENT, CI.ID_CITY,
+                C.PHONE_CLIENT, C.EMAIL_CLIENT, CI.ID_CITY, CI.NAME_CITY AS NAME_CITY,
                 S.NAME_STATE,  R.ID_ROUTE, R.NAME_ROUTE
                 FROM CLIENT C 
                 JOIN CITY CI ON C.CITY_FK = CI.ID_CITY

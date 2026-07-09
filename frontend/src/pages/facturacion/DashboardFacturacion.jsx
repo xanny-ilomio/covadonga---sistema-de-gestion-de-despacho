@@ -2,7 +2,14 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { orders } from '../../api/client';
+import Header from '../../components/Header';
 import logo from '../../../public/icons/isotipo_blanco.svg';
+import flota from '../../../public/assets/flota.svg';
+import download from '../../../public/assets/download.svg';
+import historial from '../../../public/assets/historial.svg';
+import logout from '../../../public/assets/logout.svg';
+import pedido from '../../../public/assets/pedido.svg';
+import statistics from '../../../public/assets/statistics.svg';
 import styles from '../../styles/DashboardFacturacion.module.css';
 
 const LIMITE_PEDIDOS = 8;
@@ -27,7 +34,6 @@ function tiempoRelativo(fechaStr) {
 }
 
 export default function DashboardFacturacion() {
-  const { user, logout } = useAuth();
   const navigate         = useNavigate();
 
   const [pedidos, setPedidos]         = useState([]);
@@ -114,48 +120,32 @@ export default function DashboardFacturacion() {
     }
   }
 
-  function handleLogout() {
-    clearInterval(intervalRef.current);
-    logout();
-    navigate('/');
-  }
-
   const pedidosVisibles = pedidos.filter(p => !vistos.has(p.ID_ORDER));
 
   return (
     <div className={styles.appContainer}>
 
-      <header className={styles.navbar}>
-        <div className={styles.leftSpacer}></div>
-        <div className={styles.navbarCenter}>
-          <img src={logo} alt="Logo Covadonga" className={styles.brandLogo} />
-        </div>
-        <div className={styles.navbarRight}>
-          <button className={styles.logoutButton} onClick={handleLogout}>
-            Cerrar Sesión
-          </button>
-        </div>
-      </header>
+      <Header/>
 
       <main className={styles.mainContent}>
         <div className={styles.dashboardGrid}>
 
           <section className={styles.actionSection}>
             <div className={styles.textGroup}>
-              <h1 className={styles.sectionTitle}>Módulo de Facturación</h1>
+              <h1 className={styles.sectionTitle}>Facturación</h1>
               <p className={styles.sectionSubtitle}>
-                Bienvenido, {user?.username}. Seleccione una sección para comenzar.
+                Seleccione una sección para comenzar.
               </p>
             </div>
             <div className={styles.buttonGroup}>
-              <button className={`${styles.menuButton} ${styles.menuButtonActive}`}>
-                <span className={styles.btnIcon}>📋</span> Gestionar Pedidos
+              <button className={styles.menuButton} onClick={() => navigate('/facturacion/registrar_pedido')}>
+                <span className={styles.btnIconP}><img src={pedido}/></span> Registrar Pedido
+              </button>
+              <button className={styles.menuButton} onClick={() => navigate('/facturacion/pedidos')}>
+                <span className={styles.btnIconP}><img src={pedido}/></span> Estado de Pedidos
               </button>
               <button className={styles.menuButton}>
-                <span className={styles.btnIcon}>⏱️</span> Consultar Historial
-              </button>
-              <button className={styles.menuButton}>
-                <span className={styles.btnIcon}>📊</span> Ver Estadísticas
+                <span className={styles.btnIcon}><img src={statistics}/></span> Ver Estadísticas
               </button>
             </div>
           </section>
@@ -163,11 +153,10 @@ export default function DashboardFacturacion() {
           <section className={styles.notificationsSection}>
             <div className={styles.panelHeader}>
               <div className={styles.liveIndicator}>
-                <span className={styles.pingPulse}></span>
-                <h2 className={styles.panelTitle}>Pedidos listos para descargar</h2>
+                <h2 className={styles.panelTitle}>Pedidos actualizados</h2>
               </div>
               <div className={styles.panelMeta}>
-                <span className={styles.panelSubtitle}>Actualiza cada 30s</span>
+                <span className={styles.panelSubtitle}>Listos para descargar.</span>
                 {pedidosVisibles.length > 0 && (
                   <span className={styles.badge}>{pedidosVisibles.length}</span>
                 )}
@@ -180,7 +169,7 @@ export default function DashboardFacturacion() {
               ) : pedidosVisibles.length === 0 ? (
                 <div className={styles.emptyState}>
                   <span className={styles.emptyIcon}>✓</span>
-                  <p className={styles.emptyMsg}>No hay pedidos listos por ahora</p>
+                  <p className={styles.emptyMsg}>No hay pedidos sin revisar por ahora</p>
                 </div>
               ) : (
                 pedidosVisibles.map((pedido) => {

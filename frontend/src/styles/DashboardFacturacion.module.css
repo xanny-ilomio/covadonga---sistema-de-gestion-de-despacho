@@ -14,60 +14,6 @@
 }
 
 /* ==========================================================================
-   2. NAVBAR DE TRES COLUMNAS
-   ========================================================================== */
-.navbar {
-  background-color: #b91c1c;
-  height: 65px;
-  padding: 0 40px;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr; /* Fuerza a que el centro sea perfecto */
-  align-items: center;
-  box-shadow: 0 4px 12px rgba(185, 28, 28, 0.1);
-  flex-shrink: 0;
-}
-
-.leftSpacer {
-  /* Vacío intencional para empujar el centro */
-}
-
-.navbarCenter {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.brandLogo {
-  height: 36px;
-  width: auto;
-}
-
-.navbarRight {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.logoutButton {
-  background-color: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s ease;
-}
-
-.logoutButton:hover {
-  background-color: #ffffff;
-  color: #b91c1c;
-}
-
-/* ==========================================================================
    3. ESTRUCTURA CENTRAL (DASHBOARD GRID)
    ========================================================================== */
 .mainContent {
@@ -81,8 +27,8 @@
 
 .dashboardGrid {
   display: grid;
-  grid-template-columns: 440px 420px; /* Ancho controlado para evitar dispersión */
-  gap: 60px; /* Espaciado moderno y elegante */
+  grid-template-columns: 440px 420px; 
+  gap: 120px;
   align-items: center;
 }
 
@@ -90,20 +36,20 @@
 .actionSection {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
+  align-items: center;
+  text-align: center;
 }
 
 .textGroup {
   margin-bottom: 28px;
 }
 
-.sectionTitle {
-  font-size: 30px;
+.sectionTitle, .panelTitle {
+  font-size: 2.4rem;
   font-weight: 800;
-  color: #111827;
   margin: 0 0 8px 0;
   letter-spacing: -0.5px;
+  color: var(--red);
 }
 
 .sectionSubtitle {
@@ -139,7 +85,7 @@
 .menuButton:hover {
   border-color: #fca5a5;
   background-color: #fef2f2;
-  color: #b91c1c;
+  color: var(--red);
   transform: translateX(4px);
 }
 
@@ -169,20 +115,13 @@
   gap: 8px;
 }
 
-.panelTitle {
-  font-size: 17px;
-  font-weight: 700;
-  color: #111827;
-  margin: 0;
-}
-
 .panelSubtitle {
   font-size: 13px;
   color: #9ca3af;
 }
 
 .badge {
-  background: #b91c1c;
+  background: var(--red);
   color: #fff;
   font-size: 11px;
   font-weight: 600;
@@ -215,6 +154,14 @@
 }
 .notificationList::-webkit-scrollbar-thumb:hover {
   background: #bbb;
+}
+
+.btnIcon{
+  width: 1.8rem;
+}
+.btnIconP{
+  width: 1.4rem;
+  margin-left: 0.2rem;
 }
 
 /* --- TARJETAS DE PEDIDOS INTERNAS --- */
@@ -288,7 +235,7 @@
 }
 
 .notificationCard:hover .actionButton {
-  background-color: #b91c1c;
+  background-color: var(--red);
   color: #ffffff;
 }
 
@@ -314,12 +261,12 @@
 
 .dismissButton:hover {
   background: #FEF2F2;
-  color: #B91C1C;
+  color: var(--red);
   border-color: rgba(185,28,28,0.2);
 }
 
 .downloadButton {
-  background: #B91C1C;
+  background: var(--red);
   color: #fff;
   border: none;
   border-radius: 8px;

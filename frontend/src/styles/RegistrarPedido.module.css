@@ -1,0 +1,278 @@
+.appContainer {
+  height: 100vh;
+  width: 100vw;
+  max-width: 100%;
+  background-color: #fcfcfd;
+  color: #1f2937;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.mainContent {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 40px;
+  box-sizing: border-box;
+}
+
+.pedidoForm {
+  width: 100%;
+  max-width: 950px;
+  background: #ffffff;
+  padding: 5px 30px;
+  border-radius: 24px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  min-height: 80vh;
+  max-height: 85vh; /* Bloquea la altura total para evitar scroll de pantalla completa */
+}
+
+.title {
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: var(--red);
+  margin: 0 0 8px 0;
+}
+
+.subtitle {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--red);
+  text-align: center;
+  margin: 8px 0 14px 0;
+}
+
+/* --- REJILLA DEL CLIENTE (3 COLUMNAS SEGÚN DISEÑO) --- */
+.clientSection {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.inputGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.inputGroup label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #374151;
+  min-width: 65px;
+  text-align: right;
+}
+
+.inputGroup input {
+  flex: 1;
+  background-color: #f3f4f6;
+  border: 1px solid transparent;
+  padding: 10px 14px;
+  border-radius: 30px; /* Bordes totalmente redondeados del prototipo */
+  font-size: 13.5px;
+  color: #1f2937;
+  transition: all 0.2s ease;
+}
+
+.inputGroup input:focus {
+  background-color: #ffffff;
+  border-color: #fca5a5;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.05);
+}
+
+/* --- TABLA FLOTANTE CON SCROLL DE RESPALDO --- */
+.tableWrapper {
+  overflow-y: auto;
+  min-height: 10rem;
+  max-height: 10.5rem; /* Evita que crezca infinitamente si meten 20 items */
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  margin-bottom: 12px;
+}
+
+.productTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.productTable th {
+  background-color: var(--red); /* Fondo rojo institucional de la cabecera */
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.productTable td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f3f4f6;
+  background-color: #fff;
+}
+
+.productTable tr:nth-child(even) td {
+  background-color: #f9fafb; /* Fiel a la alternancia de tonos grises */
+}
+
+.inputProducto {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  color: #374151;
+  background: #fff;
+}
+
+.inputBultos {
+  width: 50px;
+  padding: 8px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 13.5px;
+}
+
+.computedCell {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.deleteRowBtn {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 12px;
+  transition: color 0.15s;
+}
+.deleteRowBtn:hover:not(:disabled) { color: var(--red); }
+.deleteRowBtn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* --- SECCIÓN ACCIONES DE TABLA Y TOTALES --- */
+.tableActionsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 0 4px;
+}
+
+.addBtn {
+  background: transparent;
+  border: 1px dashed #d1d5db;
+  color: #4b5563;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.addBtn:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+  color: #1f2937;
+}
+
+.totalsGroup {
+  display: flex;
+  align-items: center;
+  gap: 30px; /* Margen amplio de separación para los dos indicadores */
+}
+
+.totalLabel {
+  font-size: 14px;
+  font-weight: 800;
+  color: #1c1917;
+}
+
+.totalPrice, .totalKgs {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--red); /* Color destacado según la muestra visual */
+}
+
+/* --- BOTÓN DE REGISTRO FINAL --- */
+.submitBtn {
+  background-color: var(--red);
+  color: #ffffff;
+  border: none;
+  padding: 10px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  width: 30%;
+  margin: 0 auto;
+}
+.submitBtn:hover { opacity: 0.95; }
+.submitBtn:active { transform: scale(0.99); }
+.submitBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ==========================================================================
+   3. ESTILOS DEL INTERFAZ POPUP MODAL (NOTIFICACIÓN CENTRAL)
+   ========================================================================== */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4); /* Opacidad perfecta sobre el fondo */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.popup {
+  background: #ffffff;
+  padding: 32px 40px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  animation: scaleUp 0.25s ease-out forwards;
+  max-width: 360px;
+}
+
+.successIcon {
+  width: 50px;
+  height: 50px;
+  background-color: #ef4444; /* Rojo integrado al branding */
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0 auto 16px auto;
+}
+
+.popupCard h2 {
+  font-size: 20px;
+  margin: 0 0 8px 0;
+  color: #111827;
+}
+
+.popupCard p {
+  font-size: 13.5px;
+  color: #6b7280;
+  margin: 0;
+}
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}

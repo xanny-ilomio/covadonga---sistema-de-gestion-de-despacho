@@ -1,0 +1,239 @@
+.appContainer {
+  height: 100vh;
+  width: 100vw;
+  max-width: 100%;
+  background-color: #fcfcfd;
+  color: #1f2937;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.mainContent {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: 440px 420px; 
+  gap: 120px;
+  align-items: center;
+}
+
+/* --- COLUMNA IZQUIERDA --- */
+.actionSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.textGroup {
+  margin-bottom: 24px;
+}
+
+.sectionTitle {
+  font-size: 2.4rem;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+  color: var(--red);
+}
+
+.sectionSubtitle {
+  font-size: 14.5px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.buttonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.menuButton, .statsSecondaryButton {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  padding: 16px 20px;
+  border-radius: 12px;
+  color: #374151;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
+}
+
+.menuButton:hover {
+  border-color: #fca5a5;
+  background-color: #fef2f2;
+  color: var(--red);
+  transform: translateX(4px);
+}
+
+.menuButtonActive {
+  background-color: #fef2f2;
+  border-color: #f87171;
+  color: var(--red);
+}
+
+.btnIcon { width: 1.8rem; display: flex; }
+.btnIconP { width: 1.4rem; margin-left: 0.2rem; display: flex; }
+
+/* --- COLUMNA DERECHA --- */
+.rightLayoutGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.notificationsSection {
+  background-color: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #f3f4f6;
+  padding: 24px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  height: 30rem; 
+  box-sizing: border-box; /* Evita que el padding altere el tamaño final */
+}
+
+.panelHeader {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.liveIndicator {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.panelTitle {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--red);
+}
+
+.panelSubtitleBadge {
+  font-size: 13px;
+  color: #71717a;
+  font-weight: 500;
+}
+
+.panelMeta {
+  display: flex;
+  align-items: center;
+}
+
+.badge {
+  background: #c29646;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  min-width: 22px;
+  text-align: center;
+}
+
+/* --- LISTADO INTERNO CON SCROLL --- */
+.notificationList {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding-right: 4px;
+    flex: 1; 
+}
+
+.notificationList::-webkit-scrollbar { width: 4px; }
+.notificationList::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+
+/* --- FILAS INTERACTIVAS ESTILO TABLA --- */
+.despachoRowCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 12px;
+  border-bottom: 1px solid #f4f4f5;
+  background-color: #ffffff;
+  cursor: pointer; /* Indica que es clickeable */
+  transition: background-color 0.15s ease, padding-left 0.15s ease;
+  border-radius: 6px;
+}
+
+.despachoRowCard:hover {
+  background-color: #fffbeb; /* Sutil fondo ámbar al pasar el mouse */
+  padding-left: 16px; /* Efecto dinámico elegante */
+}
+
+.despachoRowCard:last-child {
+  border-bottom: none;
+}
+
+.cardInfoGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.orderNumber {
+  font-size: 14px;
+  font-family: var(--text-b);
+}
+
+.clientNameMin {
+  font-size: 13.5px;
+  color: #6b7280;
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dateTag {
+  font-size: 13px;
+  font-weight: 600;
+  color: #44403c;
+}
+
+/* --- BOTÓN ESTADÍSTICAS INFERIOR --- */
+.statsSecondaryButton {
+  width: 100%;
+  justify-content: center;
+  align-self: center;
+}
+
+.statsSecondaryButton:hover {
+  background-color: #fafafa;
+  border-color: #d1d5db;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  gap: 8px;
+}
+.emptyIcon { font-size: 24px; color: #22c55e; }
+.emptyMsg { font-size: 13px; color: #aaa; text-align: center; }
