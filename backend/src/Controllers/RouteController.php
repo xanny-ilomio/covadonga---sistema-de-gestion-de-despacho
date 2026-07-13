@@ -35,26 +35,27 @@ class RouteController {
 
         #estados que pertenecen a esta ruta con sus ciudades
         $stmtStates = $this->db->prepare("
-            SELECT S.ID_STATE, S.NAME_STATE,
-            GROUP_CONCAT(CI.NAME_CITY ORDER BY CI.NAME_CITY SEPARATOR ', ') AS cities
-            FROM STATE S
-            LEFT JOIN CITY CI ON CI.STATE_FK = S.ID_STATE
-            WHERE S.ROUTE_FK = :route_id
-            GROUP BY S.ID_STATE, S.NAME_STATE
-            ORDER BY S.NAME_STATE ASC
+            SELECT s.ID_STATE, s.NAME_STATE,
+            GROUP_CONCAT(ci.NAME_CITY ORDER BY ci.NAME_CITY SEPARATOR ', ') AS cities
+            FROM STATE s
+            LEFT JOIN CITY ci ON ci.STATE_FK = s.ID_STATE
+            WHERE s.ROUTE_FK = :route_id
+            GROUP BY s.ID_STATE, s.NAME_STATE
+            ORDER BY s.NAME_STATE ASC
         ");
         $stmtStates->execute([':route_id' => $id]);
         $route['states'] = $stmtStates->fetchAll();
-
+        
         #pedidos asignados pa despachar
         $stmtOrders = $this->db->prepare("
-            SELECT O.ID_ORDER, O.DATE_ORDERED, O.WEIGHT_REAL, O.STATUS,
-                   C.NAME_CLIENT, C.RIF
-            FROM ORDERS O
-            JOIN CLIENT c ON O.CLIENT_FK = c.ID_CLIENT
-            WHERE O.ROUTE_FK = :route_id AND o.STATUS = 'Asignado'
-            ORDER BY O.DATE_ORDERED ASC
+            SELECT o.ID_ORDER, o.DATE_ORDERED, o.WEIGHT_REAL, o.STATUS,
+                   c.NAME_CLIENT, c.RIF
+            FROM ORDERS o
+            JOIN CLIENT c ON o.CLIENT_FK = c.ID_CLIENT
+            WHERE o.ROUTE_FK = :route_id AND o.STATUS = 'Asignado'
+            ORDER BY o.DATE_ORDERED ASC
         ");
+    
         $stmtOrders->execute([':route_id' => $id]);
         $route['pending_orders'] = $stmtOrders->fetchAll();
 

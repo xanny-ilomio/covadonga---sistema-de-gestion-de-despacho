@@ -1,5 +1,7 @@
 <?php
 
+require_once '/var/www/backend/src/lib/fpdf.php';
+
 class GuideController {
 
     private Guide $guideModel;
@@ -23,13 +25,10 @@ class GuideController {
     }
 
     // POST /guides
-    // Despacho genera la guía para una ruta
-    // Body: { "route_id": 1, "driver_id": 2, "truck_id": 1 }
-    // El sistema toma automáticamente todos los pedidos 'Asignado' de esa ruta
     public function store(): void {
         $authUser = AuthMiddleware::handle();
         if ($authUser['rol'] !== 'despacho') {
-            Response::forbidden('Solo despacho puede generar guías de despacho');
+            Response::forbidden('Solo despacho puede generar guías');
         }
 
         $body     = json_decode(file_get_contents('php://input'), true);
@@ -41,7 +40,6 @@ class GuideController {
         if (!$driverId) Response::error('driver_id es requerido', 422);
         if (!$truckId)  Response::error('truck_id es requerido', 422);
 
-        // Verificar que hay pedidos asignados en la ruta
         $orders = $this->guideModel->getAssignedOrdersByRoute((int) $routeId);
         if (empty($orders)) {
             Response::error('No hay pedidos en estado Asignado para esta ruta', 422);
@@ -50,181 +48,201 @@ class GuideController {
         try {
             $guideId = $this->guideModel->create((int) $routeId, (int) $driverId, (int) $truckId);
             $guide   = $this->guideModel->findById($guideId);
-            Response::success($guide, 'Guía de despacho generada correctamente', 201);
+            Response::success($guide, 'Guía generada correctamente', 201);
         } catch (Exception $e) {
             Response::serverError('Error al generar la guía: ' . $e->getMessage());
         }
     }
 
     // GET /guides/{id}/pdf
-    // Genera y descarga el PDF de la guía de despacho
-    // Usa HTML + CSS imprimible — no requiere librerías externas
     public function pdf(int $id): void {
         AuthMiddleware::handle();
- 
+
         $guide = $this->guideModel->findById($id);
         if (!$guide) Response::notFound("Guía con ID {$id} no encontrada");
- 
-        // Calcular totales
-        $totalOrders = count($guide['orders']);
-        $totalWeight = $guide['TOTAL_WEIGHT'];
- 
-        // Construir filas de pedidos
-        $rows = '';
-        $num  = 1;
-        foreach ($guide['orders'] as $order) {
-            $products = '';
-            foreach ($order['items'] as $item) {
-                $products .= htmlspecialchars($item['NAME_PRODUCT']) .
-                             ' x' . $item['AMOUNT'] . ', ';
-            }
-            $products = rtrim($products, ', ');
- 
-            $rows .= "
-            <tr>
-                <td>{$num}</td>
-                <td>" . htmlspecialchars($order['NAME_CLIENT']) . "</td>
-                <td>" . htmlspecialchars($order['RIF']) . "</td>
-                <td>" . htmlspecialchars($order['NAME_CITY']) . ", " . htmlspecialchars($order['NAME_STATE']) . "</td>
-                <td>{$order['PHONE_CLIENT']}</td>
-                <td>" . number_format((float)$order['WEIGHT_REAL'], 2) . " kg</td>
-                <td>{$products}</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-            </tr>";
-            $num++;
+
+        // ─── Datos ────────────────────────────────────────────────────────────
+        $guideNum    = htmlspecialchars($guide['GUIDE_NUMBER']);
+        $rutaNombre  = strtoupper($guide['NAME_ROUTE']);
+        $choferNombre= $guide['driver_name'];
+        $choferCI    = $guide['driver_ci'];
+        $placa       = $guide['PLATE'];
+        $marca       = $guide['BRAND'];
+        $capacidad   = number_format((float)$guide['CAPACITY'], 0);
+        $fecha       = $guide['EMISSION_DATE'];
+        $totalKg     = number_format((float)$guide['TOTAL_WEIGHT'], 2);
+        $orders      = $guide['orders'];
+
+        // ─── Colores ──────────────────────────────────────────────────────────
+        $rojo      = [185, 28,  28];
+        $negro     = [17,  17,  17];
+        $blanco    = [255, 255, 255];
+        $gris      = [100, 100, 100];
+        $grisClaro = [245, 245, 245];
+
+        // ─── Crear PDF ────────────────────────────────────────────────────────
+        $pdf = new FPDF('P', 'mm', 'A4');
+        $pdf->AddPage();
+        $pdf->SetMargins(15, 15, 15);
+        $pdf->SetAutoPageBreak(true, 20);
+
+        // ── ENCABEZADO ────────────────────────────────────────────────────────
+        $pdf->SetFillColor(...$rojo);
+        $pdf->Rect(0, 0, 210, 40, 'F');
+
+        $pdf->SetFont('Arial', 'B', 22);
+        $pdf->SetTextColor(...$blanco);
+        $pdf->SetXY(15, 8);
+        $pdf->Cell(100, 10, 'Alimentos Covadonga', 0, 0, 'L');
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetXY(15, 21);
+        $pdf->Cell(100, 6, 'Sistema de Gestion de Despacho', 0, 0, 'L');
+
+        $pdf->SetFont('Arial', 'B', 13);
+        $pdf->SetXY(110, 8);
+        $pdf->Cell(85, 7, 'GUIA DE DESPACHO', 0, 0, 'R');
+
+        $pdf->SetFont('Arial', 'B', 18);
+        $pdf->SetXY(110, 16);
+        $pdf->Cell(85, 8, $guideNum, 0, 0, 'R');
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetXY(110, 27);
+        $pdf->Cell(85, 6, 'Fecha: ' . $fecha, 0, 0, 'R');
+
+        // ── INFO RUTA Y VEHÍCULO ──────────────────────────────────────────────
+        $pdf->SetFillColor(...$grisClaro);
+        $pdf->SetDrawColor(220, 220, 220);
+        $pdf->Rect(15, 46, 85, 36, 'DF');
+        $pdf->Rect(110, 46, 85, 36, 'DF');
+
+        // Caja izquierda — ruta y chofer
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->SetTextColor(...$gris);
+        $pdf->SetXY(18, 48);
+        $pdf->Cell(79, 5, 'INFORMACION DE LA RUTA', 0, 1, 'L');
+
+        $pdf->SetTextColor(...$negro);
+        $y = 55;
+        foreach ([
+            'Ruta'   => $rutaNombre,
+            'Chofer' => $choferNombre,
+            'CI'     => $choferCI,
+        ] as $label => $valor) {
+            $pdf->SetXY(18, $y);
+            $pdf->SetFont('Arial', 'B', 9);
+            $pdf->Cell(22, 5, $label . ':', 0, 0, 'L');
+            $pdf->SetFont('Arial', '', 9);
+            $pdf->Cell(60, 5, (string)$valor, 0, 1, 'L');
+            $y += 6;
         }
 
-        $html = '<!DOCTYPE html>
-            <html lang="es">
-            <head>
-            <meta charset="UTF-8">
-            <title>Guía de Despacho ' . htmlspecialchars($guide['GUIDE_NUMBER']) . '</title>
-            <style>
-              * { box-sizing: border-box; margin: 0; padding: 0; }
-              body { font-family: Arial, sans-serif; font-size: 11px; color: #111; padding: 20px; }
-              .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 2px solid #B91C1C; padding-bottom: 14px; }
-              .company { font-size: 22px; font-weight: bold; color: #B91C1C; }
-              .doc-title { font-size: 14px; font-weight: bold; text-align: right; }
-              .doc-number { font-size: 18px; color: #B91C1C; font-weight: bold; }
-              .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
-              .info-box { border: 1px solid #ddd; border-radius: 6px; padding: 10px 14px; }
-              .info-box h3 { font-size: 10px; text-transform: uppercase; color: #888; margin-bottom: 8px; letter-spacing: .5px; }
-              .info-row { display: flex; gap: 6px; margin-bottom: 4px; }
-              .info-label { font-weight: bold; min-width: 80px; color: #444; }
-              table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-              thead { background: #B91C1C; color: #fff; }
-              thead th { padding: 7px 6px; text-align: left; font-size: 10px; }
-              tbody tr:nth-child(even) { background: #FEF2F2; }
-              tbody td { padding: 7px 6px; border-bottom: 1px solid #eee; vertical-align: top; }
-              .totals { display: flex; justify-content: flex-end; gap: 30px; margin-bottom: 30px; }
-              .total-item { text-align: center; }
-              .total-val { font-size: 18px; font-weight: bold; color: #B91C1C; }
-              .total-label { font-size: 10px; color: #888; margin-top: 2px; }
-              .signatures { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; margin-top: 40px; }
-              .sig-box { text-align: center; border-top: 1px solid #333; padding-top: 8px; }
-              .sig-label { font-size: 10px; color: #555; }
-              .note { font-size: 9px; color: #aaa; text-align: center; margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; }
-              @media print {
-                body { padding: 10px; }
-                .no-print { display: none; }
-              }
-            </style>
-            </head>
-            <body>
-    
-            <div class="header">
-              <div>
-                <div class="company">Covadonga</div>
-                <div style="color:#888;font-size:11px;margin-top:3px">Sistema de Gestión de Despacho</div>
-              </div>
-              <div style="text-align:right">
-                <div class="doc-title">GUÍA DE DESPACHO</div>
-                <div class="doc-number">' . htmlspecialchars($guide['GUIDE_NUMBER']) . '</div>
-                <div style="color:#888;margin-top:4px">Fecha: ' . htmlspecialchars($guide['EMISSION_DATE']) . '</div>
-              </div>
-            </div>
-    
-            <div class="info-grid">
-              <div class="info-box">
-                <h3>Información de la ruta</h3>
-                <div class="info-row"><span class="info-label">Ruta:</span> ' . htmlspecialchars($guide['NAME_ROUTE']) . '</div>
-                <div class="info-row"><span class="info-label">Total pedidos:</span> ' . $totalOrders . '</div>
-                <div class="info-row"><span class="info-label">Peso total:</span> ' . number_format((float)$totalWeight, 2) . ' kg</div>
-              </div>
-              <div class="info-box">
-                <h3>Vehículo y conductor</h3>
-                <div class="info-row"><span class="info-label">Conductor:</span> ' . htmlspecialchars($guide['driver_name']) . '</div>
-                <div class="info-row"><span class="info-label">Cédula:</span> ' . htmlspecialchars($guide['driver_ci']) . '</div>
-                <div class="info-row"><span class="info-label">Camión:</span> ' . htmlspecialchars($guide['BRAND']) . '</div>
-                <div class="info-row"><span class="info-label">Placa:</span> ' . htmlspecialchars($guide['PLATE']) . '</div>
-                <div class="info-row"><span class="info-label">Capacidad:</span> ' . htmlspecialchars($guide['CAPACITY']) . ' kg</div>
-              </div>
-            </div>
-    
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Cliente</th>
-                  <th>RIF</th>
-                  <th>Destino</th>
-                  <th>Teléfono</th>
-                  <th>Peso real</th>
-                  <th>Productos</th>
-                  <th>Firma entrega</th>
-                  <th>Firma recepción</th>
-                </tr>
-              </thead>
-              <tbody>' . $rows . '</tbody>
-            </table>
-    
-            <div class="totals">
-              <div class="total-item">
-                <div class="total-val">' . $totalOrders . '</div>
-                <div class="total-label">Pedidos</div>
-              </div>
-              <div class="total-item">
-                <div class="total-val">' . number_format((float)$totalWeight, 2) . ' kg</div>
-                <div class="total-label">Peso total</div>
-              </div>
-            </div>
-    
-            <div class="signatures">
-              <div class="sig-box">
-                <div style="height:40px"></div>
-                <div class="sig-label">Despachado por</div>
-                <div style="margin-top:4px;font-size:10px;color:#888">Fecha: _______________</div>
-              </div>
-              <div class="sig-box">
-                <div style="height:40px"></div>
-                <div class="sig-label">Conductor: ' . htmlspecialchars($guide['driver_name']) . '</div>
-                <div style="margin-top:4px;font-size:10px;color:#888">Hora: _______________</div>
-              </div>
-              <div class="sig-box">
-                <div style="height:40px"></div>
-                <div class="sig-label">Recibido por</div>
-                <div style="margin-top:4px;font-size:10px;color:#888">Fecha: _______________</div>
-              </div>
-            </div>
-    
-            <div class="note">
-              Documento generado digitalmente. Los campos de fecha, hora y firmas deben completarse al momento de la entrega.
-            </div>
-    
-            <div class="no-print" style="text-align:center;margin-top:24px">
-              <button onclick="window.print()" style="background:#B91C1C;color:#fff;border:none;padding:10px 28px;border-radius:6px;font-size:14px;cursor:pointer">
-                Imprimir / Guardar PDF
-              </button>
-            </div>
-    
-            </body>
-        </html>';
+        // Caja derecha — vehículo
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->SetTextColor(...$gris);
+        $pdf->SetXY(113, 48);
+        $pdf->Cell(79, 5, 'VEHICULO ASIGNADO', 0, 1, 'L');
 
-        // Enviar como HTML imprimible — el navegador maneja la impresión/PDF
-        header('Content-Type: text/html; charset=UTF-8');
-        header('Content-Disposition: inline; filename="guia-' . $guide['GUIDE_NUMBER'] . '.html"');
-        echo $html;
+        $pdf->SetTextColor(...$negro);
+        $y = 55;
+        foreach ([
+            'Marca'     => $marca,
+            'Placa'     => $placa,
+            'Capacidad' => $capacidad . ' kg',
+        ] as $label => $valor) {
+            $pdf->SetXY(113, $y);
+            $pdf->SetFont('Arial', 'B', 9);
+            $pdf->Cell(26, 5, $label . ':', 0, 0, 'L');
+            $pdf->SetFont('Arial', '', 9);
+            $pdf->Cell(54, 5, (string)$valor, 0, 1, 'L');
+            $y += 6;
+        }
+
+        // ── TABLA DE PEDIDOS ──────────────────────────────────────────────────
+        $pdf->SetY(90);
+
+        // Encabezado tabla
+        $pdf->SetFillColor(...$rojo);
+        $pdf->SetTextColor(...$blanco);
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetDrawColor(...$rojo);
+        $pdf->SetX(15);
+        $pdf->Cell(15,  7, '#',              1, 0, 'C', true);
+        $pdf->Cell(20,  7, 'Codigo',         1, 0, 'C', true);
+        $pdf->Cell(70,  7, 'Razon Social',   1, 0, 'L', true);
+        $pdf->Cell(30,  7, 'Kg Totales',     1, 0, 'R', true);
+        $pdf->Cell(45,  7, 'Estado entrega', 1, 1, 'C', true);
+
+        // Filas de pedidos
+        $pdf->SetDrawColor(220, 220, 220);
+        $pdf->SetFont('Arial', '', 9);
+        $num     = 1;
+        $fillRow = false;
+
+        foreach ($orders as $order) {
+            $pdf->SetFillColor(...($fillRow ? [250, 242, 242] : $blanco));
+            $pdf->SetTextColor(...$negro);
+            $pdf->SetX(15);
+            $pdf->Cell(15,  7, (string)$num,                                        1, 0, 'C', true);
+            $pdf->Cell(20,  7, $order['RIF'],                                        1, 0, 'C', true);
+            $pdf->Cell(70,  7, $order['NAME_CLIENT'],                                1, 0, 'L', true);
+            $pdf->Cell(30,  7, number_format((float)$order['WEIGHT_REAL'], 2) . ' kg', 1, 0, 'R', true);
+            $pdf->Cell(45,  7, '',                                                   1, 1, 'C', true);
+            $num++;
+            $fillRow = !$fillRow;
+        }
+
+        // Fila de totales
+        $pdf->SetFillColor(...$negro);
+        $pdf->SetTextColor(...$blanco);
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetX(15);
+        $pdf->Cell(105, 7, 'TOTAL — ' . count($orders) . ' pedido(s)',  1, 0, 'L', true);
+        $pdf->Cell(30,  7, $totalKg . ' kg',                             1, 0, 'R', true);
+        $pdf->Cell(45,  7, '',                                           1, 1, 'C', true);
+
+        // ── BLOQUE DE FIRMAS ──────────────────────────────────────────────────
+        $pdf->SetY($pdf->GetY() + 16);
+        $pdf->SetTextColor(...$negro);
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetX(15);
+        $pdf->Cell(0, 6, 'CONTROL Y FIRMAS', 0, 1, 'L');
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetDrawColor(...$negro);
+
+        $firmas = [
+            'Fecha'                          => '__________________',
+            'Hora'                           => '__________________',
+            'Entregado por'                  => '__________________________________',
+            'Recibido por (Cliente)'         => '__________________________________',
+            'Jefe de Despacho (Firma/Sello)' => '__________________________________',
+        ];
+
+        $y = $pdf->GetY() + 4;
+        foreach ($firmas as $label => $linea) {
+            $pdf->SetXY(15, $y);
+            $pdf->SetFont('Arial', 'B', 9);
+            $pdf->Cell(58, 6, $label . ':', 0, 0, 'L');
+            $pdf->SetFont('Arial', '', 9);
+            $pdf->Cell(100, 6, $linea, 0, 1, 'L');
+            $y += 9;
+        }
+
+        // ── PIE ───────────────────────────────────────────────────────────────
+        $pdf->SetY(-18);
+        $pdf->SetDrawColor(220, 220, 220);
+        $pdf->Line(15, $pdf->GetY(), 195, $pdf->GetY());
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->SetTextColor(...$gris);
+        $pdf->SetX(15);
+        $pdf->Cell(90, 8, 'Alimentos Covadonga — Guia de Despacho', 0, 0, 'L');
+        $pdf->Cell(90, 8, $guideNum . ' — ' . date('d/m/Y H:i'), 0, 0, 'R');
+
+        // ── ENVIAR PDF ────────────────────────────────────────────────────────
+        header('Content-Disposition: attachment; filename="guia-' . $guideNum . '.pdf"');
+          $pdf->Output('D', 'guia-' . $guideNum . '.pdf');
         exit;
     }
 }

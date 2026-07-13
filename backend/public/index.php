@@ -117,6 +117,8 @@ match(true) {
         => (new RouteController())->assignState($id),
  
     // Guides
+    $resource === 'guides' && $method === 'GET' && $id !== null && $subResource === 'pdf'
+    => (new GuideController())->pdf($id),
     $resource === 'guides' && $method === 'GET'  && $id === null => (new GuideController())->index(),
     $resource === 'guides' && $method === 'GET'  && $id !== null => (new GuideController())->show($id),
     $resource === 'guides' && $method === 'POST'                  => (new GuideController())->store(),
