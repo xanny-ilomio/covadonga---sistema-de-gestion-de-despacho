@@ -11,6 +11,8 @@ export default function RegistrarPedido() {
   const [listaClientes,  setListaClientes]  = useState([]);
   const [listaProductos, setListaProductos] = useState([]);
   const [listaCiudades,  setListaCiudades]  = useState([]);
+  const [ciudadNueva, setCiudadNueva] = useState(false);
+  const [listaEstados, setListaEstados] = useState([]);
 
   // ─── Formulario del cliente ───────────────────────────────────────────────
   const [clienteId,   setClienteId]   = useState(null); // null = cliente nuevo
@@ -22,6 +24,7 @@ export default function RegistrarPedido() {
     ciudad: '',
     email:  '',
     cityId: null,
+    stateId: null,
   });
 
   // ─── Filas de productos ───────────────────────────────────────────────────
@@ -38,14 +41,16 @@ export default function RegistrarPedido() {
   useEffect(() => {
     async function init() {
       try {
-        const [resCli, resProd, resCiu] = await Promise.all([
+        const [resCli, resProd, resCiu, resEst] = await Promise.all([
           clients.getAll(),
           products.getAll(),
           cities.getAll(),
+          states.getAll(),
         ]);
         if (resCli.status  === 'success') setListaClientes(resCli.data);
         if (resProd.status === 'success') setListaProductos(resProd.data);
         if (resCiu.status  === 'success') setListaCiudades(resCiu.data);
+        if (resEst.status  === 'success') setListaEstados(resEst.data);
       } catch (err) {
         console.error('Error cargando datos:', err);
       }
@@ -55,52 +60,58 @@ export default function RegistrarPedido() {
 
   // ─── Autorelleno del cliente al escribir nombre ───────────────────────────
   function handleNombreCliente(valor) {
-    setClienteForm(prev => ({ ...prev, nombre: valor }));
-    
+  setClienteForm(prev => ({ ...prev, nombre: valor }));
 
-    // Buscar coincidencia exacta en la lista
-    const encontrado = listaClientes.find(c =>
-      c.NAME_CLIENT.trim().toLowerCase() === valor.trim().toLowerCase()
-    );
+  const encontrado = listaClientes.find(c =>
+    c.NAME_CLIENT.trim().toLowerCase() === valor.trim().toLowerCase()
+  );
 
-    if (encontrado) {
-      // Cliente existe — autorrellenar todos los campos con datos de la BD
-      setClienteId(encontrado.ID_CLIENT);
-      setClienteForm({
-        nombre: encontrado.NAME_CLIENT,
-        rif:    encontrado.RIF         || '',
-        phone:  encontrado.PHONE_CLIENT || '',
-        estado: encontrado.NAME_STATE  || '',
-        ciudad: encontrado.NAME_CITY   || '',
-        email:  encontrado.EMAIL_CLIENT || '',
-        cityId: encontrado.ID_CITY,
-      });
-    } else {
-      // Cliente nuevo — limpiar ID para que el backend lo cree
-      setClienteId(null);
-      setClienteForm(prev => ({ ...prev, nombre: valor }));
-    }
+  if (encontrado) {
+    setClienteId(encontrado.ID_CLIENT);
+    setClienteForm({
+      nombre:  encontrado.NAME_CLIENT,
+      rif:     encontrado.RIF          || '',
+      phone:   encontrado.PHONE_CLIENT || '',
+      estado:  encontrado.NAME_STATE   || '',
+      ciudad:  encontrado.NAME_CITY    || '',
+      email:   encontrado.EMAIL_CLIENT || '',
+      cityId:  encontrado.ID_CITY,
+      stateId: null,
+    });
+  } else {
+    setClienteId(null);
+    setClienteForm(prev => ({
+      ...prev,
+      nombre: valor,
+      stateId: null,
+    }));
   }
+}
 
   // ─── Cambios generales en el formulario del cliente ───────────────────────
   function handleClienteField(campo, valor) {
-    setClienteForm(prev => ({ ...prev, [campo]: valor }));
+  setClienteForm(prev => ({ ...prev, [campo]: valor }));
 
-    // Si cambia la ciudad, buscar su ID y estado automáticamente
-    if (campo === 'ciudad') {
-      const ciudadEncontrada = listaCiudades.find(c =>
-        c.NAME_CITY.trim().toLowerCase() === valor.trim().toLowerCase()
-      );
-      if (ciudadEncontrada) {
-        setClienteForm(prev => ({
-          ...prev,
-          ciudad: valor,
-          estado: ciudadEncontrada.NAME_STATE,
-          cityId: ciudadEncontrada.ID_CITY,
-        }));
-      }
+  if (campo === 'ciudad') {
+    const ciudadEncontrada = listaCiudades.find(c =>
+      c.NAME_CITY.trim().toLowerCase() === valor.trim().toLowerCase()
+    );
+    if (ciudadEncontrada) {
+      // Ciudad existe — autorrellenar estado y cityId
+      setClienteForm(prev => ({
+        ...prev,
+        ciudad: valor,
+        estado: ciudadEncontrada.NAME_STATE,
+        cityId: ciudadEncontrada.ID_CITY,
+      }));
+      setCiudadNueva(false);
+    } else {
+      // Ciudad no existe — limpiar cityId y marcar como nueva
+      setClienteForm(prev => ({ ...prev, ciudad: valor, estado: '', cityId: null }));
+      setCiudadNueva(valor.trim().length > 2); // mostrar aviso si escribió algo
     }
   }
+}
 
   // ─── Cambios en filas de productos ───────────────────────────────────────
   function handleFilaCambio(idTemp, campo, valor) {
@@ -169,9 +180,9 @@ export default function RegistrarPedido() {
     if (!clienteForm.rif.trim()) {
       setError('El RIF es requerido'); return;
     }
-    if (!clienteForm.cityId) {
-      setError('Selecciona una ciudad válida de la lista'); return;
-    }
+    if (!clienteForm.cityId && !clienteForm.stateId) {
+  setError('Selecciona una ciudad válida o indica el estado para la ciudad nueva'); return;
+}
     if (filas.some(f => !f.productId)) {
       setError('Selecciona productos válidos de la lista para todas las filas'); return;
     }
@@ -179,6 +190,23 @@ export default function RegistrarPedido() {
     setGuardando(true);
     try {
       let idClienteFinal = clienteId;
+      let cityIdFinal = clienteForm.cityId;
+
+      if (!cityIdFinal && clienteForm.ciudad && clienteForm.stateId) {
+        // Ciudad nueva — crearla primero
+        const resCiudad = await cities.create({
+          name:     clienteForm.ciudad,
+          state_id: clienteForm.stateId,
+        });
+        if (resCiudad.status !== 'success') {
+          setError(resCiudad.message || 'Error al crear la ciudad'); return;
+        }
+        cityIdFinal = resCiudad.data.ID_CITY;
+      }
+
+      if (!cityIdFinal) {
+        setError('Selecciona una ciudad válida o elige el estado para la ciudad nueva'); return;
+      }
 
       // Si el cliente no existe, crearlo primero
       if (!clienteId) {
@@ -187,7 +215,7 @@ export default function RegistrarPedido() {
           rif:     clienteForm.rif,
           phone:   clienteForm.phone,
           email:   clienteForm.email || null,
-          city_id: clienteForm.cityId,
+          city_id: cityIdFinal, 
         });
         if (resCliente.status !== 'success') {
           setError(resCliente.message || 'Error al crear el cliente'); return;
@@ -235,86 +263,106 @@ export default function RegistrarPedido() {
           {/* SECCIÓN CLIENTE */}
           <div className={styles.clientSection}>
 
-            {/* Nombre — con datalist para sugerencias */}
-            <div className={styles.inputGroup}>
-              <label>Cliente</label>
-              <input
-                type="text"
-                placeholder="Razón social..."
-                value={clienteForm.nombre}
-                onChange={e => handleNombreCliente(e.target.value)}
-                list="clientes-list"
-                autoComplete="off"
-              />
-              <datalist id="clientes-list">
-                {listaClientes.map(c => (
-                  <option key={c.ID_CLIENT} value={c.NAME_CLIENT} />
-                ))}
-              </datalist>
-            </div>
+  <div className={styles.inputGroup}>
+    <label>Cliente</label>
+    <input
+      type="text"
+      placeholder="Razón social..."
+      value={clienteForm.nombre}
+      onChange={e => handleNombreCliente(e.target.value)}
+      list="clientes-list"
+      autoComplete="off"
+    />
+    <datalist id="clientes-list">
+      {listaClientes.map(c => (
+        <option key={c.ID_CLIENT} value={c.NAME_CLIENT} />
+      ))}
+    </datalist>
+  </div>
 
-            <div className={styles.inputGroup}>
-              <label>RIF</label>
-              <input
-                type="text"
-                placeholder="J-XXXXXXXX"
-                value={clienteForm.rif}
-                onChange={e => handleClienteField('rif', e.target.value)}
-              />
-            </div>
+  <div className={styles.inputGroup}>
+    <label>RIF</label>
+    <input
+      type="text"
+      placeholder="J-XXXXXXXX"
+      value={clienteForm.rif}
+      onChange={e => handleClienteField('rif', e.target.value)}
+    />
+  </div>
 
-            <div className={styles.inputGroup}>
-              <label>Teléfono</label>
-              <input
-                type="text"
-                placeholder="04XXXXXXXXX"
-                value={clienteForm.phone}
-                onChange={e => handleClienteField('phone', e.target.value)}
-              />
-            </div>
+  <div className={styles.inputGroup}>
+    <label>Teléfono</label>
+    <input
+      type="text"
+      placeholder="04XXXXXXXXX"
+      value={clienteForm.phone}
+      onChange={e => handleClienteField('phone', e.target.value)}
+    />
+  </div>
 
-            {/* Ciudad — con datalist, autorellena el estado */}
-            <div className={styles.inputGroup}>
-              <label>Ciudad</label>
-              <input
-                type="text"
-                placeholder="Maracay..."
-                value={clienteForm.ciudad}
-                onChange={e => handleClienteField('ciudad', e.target.value)}
-                list="ciudades-list"
-                autoComplete="off"
-              />
-              <datalist id="ciudades-list">
-                {listaCiudades.map(c => (
-                  <option key={c.ID_CITY} value={c.NAME_CITY} />
-                ))}
-              </datalist>
-            </div>
+  {/* Ciudad con datalist */}
+  <div className={styles.inputGroup}>
+    <label>Ciudad</label>
+    <input
+      type="text"
+      placeholder="Maracay..."
+      value={clienteForm.ciudad}
+      onChange={e => handleClienteField('ciudad', e.target.value)}
+      list="ciudades-list"
+      autoComplete="off"
+    />
+    <datalist id="ciudades-list">
+      {listaCiudades.map(c => (
+        <option key={c.ID_CITY} value={c.NAME_CITY} />
+      ))}
+    </datalist>
+  </div>
 
-            {/* Estado — se autorellena al elegir ciudad */}
-            <div className={styles.inputGroup}>
-              <label>Estado</label>
-              <input
-                type="text"
-                placeholder="Se rellena al elegir ciudad..."
-                value={clienteForm.estado}
-                onChange={e => handleClienteField('estado', e.target.value)}
-                readOnly={!!clienteForm.cityId}
-                className={clienteForm.cityId ? styles.inputReadonly : ''}
-              />
-            </div>
+  {/* Estado — siempre visible, readonly si ciudad existe, select si es nueva */}
+  <div className={styles.inputGroup}>
+    <label>Estado</label>
+    {clienteForm.cityId ? (
+      // Ciudad existente — estado se autorellena como texto
+      <input
+        type="text"
+        value={clienteForm.estado}
+        readOnly
+        className={styles.inputReadonly}
+        placeholder="Se rellena automáticamente..."
+      />
+    ) : (
+      // Ciudad nueva — dropdown para seleccionar estado
+      <select
+        value={clienteForm.stateId ?? ''}
+        onChange={e => {
+          const estadoSel = listaEstados.find(s => String(s.ID_STATE) === String(e.target.value));
+          setClienteForm(prev => ({
+            ...prev,
+            estado:  estadoSel?.NAME_STATE ?? '',
+            stateId: estadoSel?.ID_STATE   ?? null,
+          }));
+        }}
+        className={styles.inputSelect}
+      >
+        <option value="">Selecciona el estado...</option>
+        {listaEstados.map(s => (
+          <option key={s.ID_STATE} value={s.ID_STATE}>{s.NAME_STATE}</option>
+        ))}
+      </select>
+    )}
+  </div>
 
-            <div className={styles.inputGroup}>
-              <label>Correo</label>
-              <input
-                type="email"
-                placeholder="correo@ejemplo.com"
-                value={clienteForm.email}
-                onChange={e => handleClienteField('email', e.target.value)}
-              />
-            </div>
+  <div className={styles.inputGroup}>
+    <label>Correo</label>
+    <input
+      type="email"
+      placeholder="correo@ejemplo.com"
+      value={clienteForm.email}
+      onChange={e => handleClienteField('email', e.target.value)}
+    />
+  </div>
 
-          </div>
+</div>
 
           {/* TABLA DE PRODUCTOS */}
           <h2 className={styles.subtitle}>Productos</h2>

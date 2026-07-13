@@ -66,7 +66,7 @@ export default function DashboardDespacho() {
               <button className={styles.menuButton} onClick={() => navigate('/despacho/flota')}>
                 <span className={styles.btnIcon}><img src={flota} alt="Flota"/></span> Flota y Choferes
               </button>
-              <button className={styles.menuButton} onClick={() => navigate('/despacho/historial')}>
+              <button className={styles.menuButton} onClick={() => navigate('/despacho/guias')}>
                 <span className={styles.btnIcon}><img src={historial} alt="Historial"/></span> Historial
               </button>
               <button className={styles.menuButton} onClick={() => navigate('/despacho/estadisticas')}>

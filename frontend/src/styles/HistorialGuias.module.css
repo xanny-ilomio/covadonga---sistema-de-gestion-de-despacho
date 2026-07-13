@@ -1,0 +1,339 @@
+.appContainer {
+  height: 100vh;
+  width: 100vw;
+  background: #F8F7F4;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  gap: 0;
+  overflow: hidden;
+}
+
+/* ── Sidebar izquierda ───────────────────────────────────────────────────── */
+.sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  background: #fff;
+  border-right: 0.5px solid rgba(0,0,0,0.07);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.sidebar::-webkit-scrollbar { display: none; }
+
+/* ── Resumen del mes ─────────────────────────────────────────────────────── */
+.resumenMes {
+  background: #B91C1C;
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+.resumenTitulo {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 12px;
+}
+.resumenStats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.resumenStat { text-align: center; flex: 1; }
+.resumenNum {
+  display: block;
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+.resumenLabel {
+  display: block;
+  font-size: 10px;
+  color: rgba(255,255,255,0.65);
+  margin-top: 3px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+.resumenDivider {
+  width: 0.5px;
+  height: 30px;
+  background: rgba(255,255,255,0.2);
+}
+
+/* ── Mini calendario ─────────────────────────────────────────────────────── */
+.calendario {
+  background: #FAFAFA;
+  border: 0.5px solid #f0f0f0;
+  border-radius: 14px;
+  padding: 12px;
+}
+.calHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.calTitulo {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1f2937;
+}
+.calNav {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  line-height: 1;
+  transition: background 150ms, color 150ms;
+}
+.calNav:hover { background: #f3f4f6; color: #374151; }
+
+.calGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.calDiaNombre {
+  font-size: 10px;
+  font-weight: 600;
+  color: #9ca3af;
+  text-align: center;
+  padding: 4px 0;
+  text-transform: uppercase;
+}
+.calDia {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #374151;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  transition: background 150ms, color 150ms;
+  gap: 1px;
+}
+.calDia:hover:not(.calDiaVacio) { background: #FEF2F2; color: #B91C1C; }
+.calDiaVacio { cursor: default; }
+.calDiaConGuia { font-weight: 600; color: #1f2937; }
+.calDiaSeleccionado {
+  background: #B91C1C !important;
+  color: #fff !important;
+  font-weight: 700;
+}
+.calPunto {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #B91C1C;
+  flex-shrink: 0;
+}
+.calDiaSeleccionado .calPunto { background: rgba(255,255,255,0.6); }
+
+/* ── Filtros ─────────────────────────────────────────────────────────────── */
+.filtroGrupo { display: flex; flex-direction: column; gap: 6px; }
+.filtroLabel { font-size: 11px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: .4px; }
+.filtroSelect {
+  padding: 9px 12px;
+  border: 0.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #374151;
+  background: #FAFAFA;
+  outline: none;
+  transition: border-color 150ms;
+}
+.filtroSelect:focus { border-color: #B91C1C; }
+
+.btnLimpiar {
+  background: transparent;
+  border: 0.5px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 12px;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: background 150ms, color 150ms;
+  text-align: center;
+}
+.btnLimpiar:hover { background: #FEF2F2; color: #B91C1C; border-color: rgba(185,28,28,0.2); }
+
+/* ── Contenido derecho ───────────────────────────────────────────────────── */
+.contenido {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 20px 24px 0;
+}
+.contenidoHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 16px;
+}
+.titulo {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #B91C1C;
+  margin: 0;
+  flex-shrink: 0;
+}
+.buscador {
+  flex: 1;
+  max-width: 320px;
+  padding: 9px 14px;
+  border: 0.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #374151;
+  background: #fff;
+  outline: none;
+  transition: border-color 150ms, box-shadow 150ms;
+}
+.buscador:focus {
+  border-color: #B91C1C;
+  box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+}
+
+/* ── Lista ───────────────────────────────────────────────────────────────── */
+.lista {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 24px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.lista::-webkit-scrollbar { display: none; }
+
+/* ── Estado vacío ────────────────────────────────────────────────────────── */
+.estadoVacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 10px;
+  color: #9ca3af;
+}
+.estadoIcono { font-size: 36px; }
+.estadoVacio p { font-size: 14px; margin: 0; }
+.btnLimpiarInline {
+  background: transparent;
+  border: none;
+  color: #B91C1C;
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  margin-top: 4px;
+}
+
+/* ── Separador de fecha ──────────────────────────────────────────────────── */
+.grupoFecha { margin-bottom: 16px; }
+.separadorFecha {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.separadorLinea { flex: 1; height: 0.5px; background: #e5e7eb; }
+.separadorLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  white-space: nowrap;
+}
+
+/* ── Card de guía ────────────────────────────────────────────────────────── */
+.cardGuia {
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: box-shadow 150ms, transform 120ms;
+}
+.cardGuia:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.09);
+  transform: translateY(-1px);
+}
+
+.cardIzq { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+
+.guiaNum {
+  font-size: 15px;
+  font-weight: 700;
+  color: #B8860B;
+  font-family: monospace;
+}
+.guiaMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+.guiaRuta { font-weight: 600; color: #1f2937; }
+.guiaSep  { color: #d1d5db; }
+.guiaChofer { color: #6b7280; }
+
+.guiaDetalle { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.guiaTag {
+  font-size: 11px;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.cardDer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+.guiaFecha {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+.btnDescargar {
+  background: #B91C1C;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 150ms, transform 120ms, opacity 150ms;
+}
+.btnDescargar:hover:not(:disabled)  { background: #991B1B; }
+.btnDescargar:active:not(:disabled) { transform: scale(0.95); }
+.btnDescargar:disabled { opacity: 0.5; cursor: not-allowed; }

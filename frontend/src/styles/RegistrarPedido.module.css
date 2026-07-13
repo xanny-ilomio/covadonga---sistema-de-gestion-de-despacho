@@ -276,3 +276,32 @@
   from { opacity: 0; transform: scale(0.9); }
   to { opacity: 1; transform: scale(1); }
 }
+
+.inputReadonly {
+  flex: 1;
+  background: #f3f4f6;
+  border: 1px solid transparent;
+  padding: 10px 14px;
+  border-radius: 30px;
+  font-size: 13.5px;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.inputSelect {
+  flex: 1;
+  background: #f3f4f6;
+  border: 1px solid transparent;
+  padding: 10px 14px;
+  border-radius: 30px;
+  font-size: 13.5px;
+  color: #1f2937;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.inputSelect:focus {
+  background: #ffffff;
+  border-color: #fca5a5;
+  box-shadow: 0 0 0 3px rgba(185,28,28,0.05);
+}

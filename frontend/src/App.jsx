@@ -32,6 +32,8 @@ export default function App() {
   const GestionPedidos = lazy(() => import('./pages/GestionPedidos'));
   const ActualizarPedido = lazy(() => import('./pages/despacho/ActualizarPedido'));
   const GestionFlota = lazy(() => import('./pages/despacho/GestionFlota'));
+  const GestionRutas = lazy(() => import('./pages/despacho/GestionRutas'));
+  const HistorialGuias = lazy(() => import('./pages/despacho/HistorialGuias'));
   return (
     <AuthProvider>
       <BrowserRouter>
@@ -101,6 +103,14 @@ export default function App() {
                 element={
                   <ProtectedRoute requiredRole="despacho">
                     <GestionFlota />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/despacho/guias"
+                element={
+                  <ProtectedRoute requiredRole="despacho">
+                    <HistorialGuias />
                   </ProtectedRoute>
                 }
               />

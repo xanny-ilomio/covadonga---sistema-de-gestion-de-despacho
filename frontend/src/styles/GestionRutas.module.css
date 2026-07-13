@@ -1,0 +1,398 @@
+/* ── Raíz ─────────────────────────────────────────────────────────────────── */
+.appContainer {
+  height: 100%;
+  /* width: 100vw; */
+  background: #F8F7F4;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+}
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 20px 0;
+  overflow: hidden;
+}
+
+/* ── Título ──────────────────────────────────────────────────────────────── */
+.titulo {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #B91C1C;
+  margin: 0 0 16px;
+  text-align: center;
+}
+
+/* ── Top bar ─────────────────────────────────────────────────────────────── */
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 680px;
+  margin-bottom: 14px;
+}
+.totalRutas { font-size: 13px; color: #9ca3af; }
+.btnNuevaRuta {
+  background: #B91C1C;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 150ms, transform 120ms;
+}
+.btnNuevaRuta:hover  { opacity: 0.88; }
+.btnNuevaRuta:active { transform: scale(0.97); }
+
+/* ── Lista ───────────────────────────────────────────────────────────────── */
+.lista {
+  width: 100%;
+  max-width: 680px;
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.lista::-webkit-scrollbar { display: none; }
+.msgVacio { text-align: center; color: #aaa; font-size: 14px; margin-top: 40px; }
+
+/* ── Card acordeón ───────────────────────────────────────────────────────── */
+.cardRuta {
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.cardHeader {
+  width: 100%;
+  background: #B91C1C;
+  border: none;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: background 150ms;
+}
+.cardHeader:hover { background: #991B1B; }
+.rutaNombre {
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: .5px;
+  min-width: 110px;
+  text-align: left;
+}
+.barraContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sinCamion { font-size: 10px; color: #FCA5A5; font-weight: 500; }
+.barraWrap { display: flex; align-items: center; gap: 8px; }
+.barraLabel { font-size: 10px; color: rgba(255,255,255,0.7); white-space: nowrap; }
+.barraTrack {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.barraFill {
+  height: 100%;
+  border-radius: 10px;
+  background: #fff;
+  transition: width 500ms cubic-bezier(0.23,1,0.32,1);
+  min-width: 4px;
+}
+.barraPct { font-size: 18px; font-weight: 800; color: #fff; min-width: 42px; text-align: right; }
+.flecha {
+  font-size: 12px;
+  color: rgba(255,255,255,0.8);
+  transition: transform 280ms cubic-bezier(0.23,1,0.32,1);
+  flex-shrink: 0;
+}
+.flechaAbierta { transform: rotate(180deg); }
+
+/* ── Panel desplegable ───────────────────────────────────────────────────── */
+.panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 320ms cubic-bezier(0.23,1,0.32,1);
+  background: #FFFCF0;
+}
+.panelAbierto { max-height: 600px; }
+.panelInner {
+  display: flex;
+  gap: 24px;
+  padding: 20px 24px;
+  align-items: flex-start;
+}
+
+/* Izquierda */
+.panelIzq { flex: 1; min-width: 0; }
+.panelSubHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.panelSubtitulo {
+  font-size: 12px;
+  font-weight: 700;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin: 0;
+}
+.btnAsignarCamion {
+  background: #fff;
+  border: 0.5px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 12px;
+  color: #374151;
+  cursor: pointer;
+  transition: background 150ms, border-color 150ms;
+  white-space: nowrap;
+}
+.btnAsignarCamion:hover { background: #FEF2F2; border-color: #B91C1C; color: #B91C1C; }
+
+.sinPedidos { font-size: 13px; color: #ccc; }
+.listaPedidos { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.itemPedido {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 10px;
+  background: #fff;
+  border-radius: 8px;
+  border: 0.5px solid #EDE8D4;
+}
+.itemCliente { font-size: 13px; color: #374151; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.itemKg { font-size: 12px; color: #B91C1C; font-weight: 600; flex-shrink: 0; }
+
+.advertenciaMin {
+  font-size: 11px;
+  color: #f59e0b;
+  margin-top: 10px;
+  background: #FFFBEB;
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+/* Derecha */
+.panelDer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+  min-width: 160px;
+}
+.kgDisplay { display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; justify-content: center; }
+.kgUsados { font-size: 42px; font-weight: 800; color: #1f2937; line-height: 1; }
+.kgSep { font-size: 16px; color: #9ca3af; font-weight: 500; }
+.kgMax { font-size: 13px; color: #9ca3af; width: 100%; text-align: center; }
+.btnGenerarGuia {
+  background: #fff;
+  color: #B91C1C;
+  border: 1.5px solid #B91C1C;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 150ms, color 150ms, transform 120ms;
+  width: 100%;
+}
+.btnGenerarGuia:hover:not(:disabled) { background: #B91C1C; color: #fff; }
+.btnGenerarGuia:active:not(:disabled) { transform: scale(0.97); }
+.btnGenerarGuia:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── Overlay ─────────────────────────────────────────────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* ── Modal ───────────────────────────────────────────────────────────────── */
+.modal {
+  background: #fff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 420px;
+  padding: 28px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.18);
+  animation: scaleUp 0.2s ease-out forwards;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.modalHeader { display: flex; align-items: center; justify-content: space-between; }
+.modalTitulo { font-size: 17px; font-weight: 700; color: #1f2937; margin: 0; }
+.btnCerrar {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 150ms;
+}
+.btnCerrar:hover { background: #f3f4f6; }
+.modalRutaInfo {
+  background: #FEF2F2;
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modalRutaNombre { font-size: 14px; font-weight: 700; color: #B91C1C; text-transform: uppercase; }
+.modalRutaPedidos { font-size: 12px; color: #9ca3af; }
+
+/* Indicador carga mínima */
+.cargaMinima {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-align: center;
+}
+.cargaOk   { background: #F0FDF4; color: #16a34a; }
+.cargaFalta { background: #FFFBEB; color: #d97706; }
+
+.modalBody { display: flex; flex-direction: column; gap: 14px; }
+.campo { display: flex; flex-direction: column; gap: 6px; }
+.campo label { font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: .4px; }
+.campo input,
+.selectCamion {
+  padding: 10px 14px;
+  border: 0.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #1f2937;
+  background: #FAFAFA;
+  outline: none;
+  transition: border-color 150ms, box-shadow 150ms;
+  width: 100%;
+}
+.campo input:focus,
+.selectCamion:focus {
+  border-color: #B91C1C;
+  box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+  background: #fff;
+}
+.modalFooter { display: flex; gap: 10px; justify-content: flex-end; }
+.btnSecundario {
+  background: transparent;
+  border: 0.5px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 14px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: background 150ms;
+}
+.btnSecundario:hover { background: #f9fafb; }
+.btnPrimario {
+  background: #B91C1C;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 150ms, transform 120ms;
+}
+.btnPrimario:hover:not(:disabled)  { opacity: 0.88; }
+.btnPrimario:active:not(:disabled) { transform: scale(0.97); }
+.btnPrimario:disabled { opacity: 0.5; cursor: not-allowed; }
+.errorMsg {
+  font-size: 12px;
+  color: #B91C1C;
+  background: #FEF2F2;
+  border: 0.5px solid rgba(185,28,28,0.2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  text-align: center;
+  margin: -6px 0;
+}
+
+/* ── Popup éxito ─────────────────────────────────────────────────────────── */
+.popup {
+  background: #fff;
+  padding: 36px 44px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+  animation: scaleUp 0.22s ease-out forwards;
+  max-width: 320px;
+}
+.successIcon {
+  width: 50px;
+  height: 50px;
+  background: #B91C1C;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: bold;
+  margin: 0 auto 14px;
+}
+.popup h2 { font-size: 18px; color: #111827; margin: 0 0 6px; }
+.popup p  { font-size: 13px; color: #6b7280; margin: 0; line-height: 1.5; }
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.estadosGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+.estadoChip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid #e5e7eb;
+  background: #fff;
+  color: #6b7280;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 150ms;
+}
+.estadoChip:hover { border-color: #B91C1C; color: #B91C1C; }
+.estadoChipActivo {
+  background: #FEF2F2;
+  border-color: #B91C1C;
+  color: #B91C1C;
+  font-weight: 600;
+}
+.estadosVacio { font-size: 12px; color: #aaa; }
