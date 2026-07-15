@@ -27,17 +27,46 @@ function BarraCapacidad({ usado, maximo }) {
   );
 }
 
-// ─── Modal crear/editar ruta ──────────────────────────────────────────────────
 // ─── Modal crear ruta ─────────────────────────────────────────────────────────
-function ModalRuta({ listaEstados, onGuardar, onCerrar, guardando, error }) {
-  const [nombre,         setNombre]         = useState('');
-  const [estadosSelec,   setEstadosSelec]   = useState([]); // IDs seleccionados
+function ModalRuta({ listaEstados = [], onGuardar, onCerrar, guardando, error }) {
+  const [nombre, setNombre] = useState('');
+  const [estadosSelec, setEstadosSelec] = useState([]); // IDs seleccionados
 
+  // 1. Filtrar los estados que están completamente libres (ROUTE_FK es null, vacío, 0 o string 'null')
+  const libres = listaEstados.filter(s => {
+    const fk = s.ROUTE_FK;
+    return (
+      fk === null || 
+      fk === undefined || 
+      fk === '' || 
+      fk === 0 || 
+      fk === '0' || 
+      String(fk).toLowerCase() === 'null'
+    );
+  });
+
+  // 2. Permitir seleccionar varios estados para la misma ruta (Multiselección)
   function toggleEstado(id) {
     setEstadosSelec(prev =>
       prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]
     );
   }
+
+  const handleCrear = () => {
+    if (!nombre.trim()) return;
+    
+    // Bloqueo estricto: evitar crear ruta sin estados asignados
+    if (estadosSelec.length === 0) {
+      alert('Debes seleccionar al menos un estado para crear la ruta.');
+      return;
+    }
+
+    // Enviamos el objeto con la estructura que espera la función "crearRuta"
+    onGuardar({
+      name: nombre,
+      estados: estadosSelec
+    });
+  };
 
   return (
     <div className={styles.overlay}>
@@ -59,20 +88,24 @@ function ModalRuta({ listaEstados, onGuardar, onCerrar, guardando, error }) {
           </div>
 
           <div className={styles.campo}>
-            <label>Estados que cubre</label>
-            <div className={styles.estadosGrid}>
-              {listaEstados.map(s => (
-                <button
-                  key={s.ID_STATE}
-                  type="button"
-                  className={`${styles.estadoChip} ${estadosSelec.includes(s.ID_STATE) ? styles.estadoChipActivo : ''}`}
-                  onClick={() => toggleEstado(s.ID_STATE)}
-                >
-                  {estadosSelec.includes(s.ID_STATE) ? '✓ ' : ''}{s.NAME_STATE}
-                </button>
-              ))}
-            </div>
-            {listaEstados.length === 0 && (
+            <label>Estados que cubrir (Puedes seleccionar varios)</label>
+            {libres.length > 0 ? (
+              <div className={styles.estadosGrid}>
+                {libres.map(s => {
+                  const estaSeleccionado = estadosSelec.includes(s.ID_STATE);
+                  return (
+                    <button
+                      key={s.ID_STATE}
+                      type="button"
+                      className={`${styles.estadoChip} ${estaSeleccionado ? styles.estadoChipActivo : ''}`}
+                      onClick={() => toggleEstado(s.ID_STATE)}
+                    >
+                      {estaSeleccionado ? '✓ ' : ''}{s.NAME_STATE}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
               <p className={styles.estadosVacio}>No hay estados disponibles sin ruta asignada</p>
             )}
           </div>
@@ -84,8 +117,8 @@ function ModalRuta({ listaEstados, onGuardar, onCerrar, guardando, error }) {
           <button className={styles.btnSecundario} onClick={onCerrar}>Cancelar</button>
           <button
             className={styles.btnPrimario}
-            onClick={() => onGuardar({ name: nombre, estados: estadosSelec })}
-            disabled={guardando}
+            onClick={handleCrear}
+            disabled={guardando || !nombre.trim() || estadosSelec.length === 0}
           >
             {guardando ? 'Creando...' : 'Crear ruta'}
           </button>
@@ -391,13 +424,21 @@ export default function GestionRutas() {
   async function cargarDatos() {
     setCargando(true);
     try {
-      const [resRutas, resCam, resCho] = await Promise.all([
+      // 1. Añadimos routes.getStates() al Promise.all para cargar todo a la vez
+      const [resRutas, resCam, resCho, resEst] = await Promise.all([
         routes.getAll(),
         trucks.getAll(),
         drivers.getAll(),
+        routes.getStates(), // <--- ¡AQUÍ SE SOLICITAN LOS ESTADOS!
       ]);
+      
       if (resCam.status === 'success') setListaCamiones(resCam.data);
       if (resCho.status === 'success') setListaChoferes(resCho.data);
+      
+      // 2. Guardamos la respuesta de los estados en tu state para el modal
+      if (resEst.status === 'success') {
+        setListaEstados(resEst.data);
+      }
 
       if (resRutas.status === 'success') {
         // Cargar detalle de cada ruta para obtener los pedidos
@@ -431,34 +472,38 @@ export default function GestionRutas() {
 
   // ─── Crear ruta ─────────────────────────────────────────────────────────
   async function crearRuta(form) {
-  setErrorModal('');
-  if (!form.name.trim()) { setErrorModal('El nombre es requerido'); return; }
+    setErrorModal('');
+    if (!form.name.trim()) { setErrorModal('El nombre es requerido'); return; }
 
-  setGuardando(true);
-  try {
-    // 1. Crear la ruta
-    const res = await routes.create({ name: form.name });
-    if (res.status !== 'success') {
-      setErrorModal(res.message || 'Error al crear la ruta'); return;
+    setGuardando(true);
+    try {
+      // 1. Crear la ruta
+      const res = await routes.create({ name: form.name });
+      if (res.status !== 'success') {
+        setErrorModal(res.message || 'Error al crear la ruta'); return;
+      }
+
+      const nuevaRutaId = res.data.ID_ROUTE;
+
+      // 2. Asignar cada estado seleccionado a la ruta
+      await Promise.all(
+        form.estados.map(stateId =>
+          routes.assignState(nuevaRutaId, stateId)
+        )
+      );
+
+      setModalNuevaRuta(false);
+      
+      // 3. Volvemos a consultar la base de datos para que los estados asignados dejen de figurar como "libres"
+      await cargarDatos(); 
+      
+      mostrarExito('Ruta creada correctamente con sus estados asignados');
+    } catch (err) {
+      // Si el backend rebotó la petición por estado duplicado, lo mostramos en el modal
+      setErrorModal(err.message || 'Error al guardar la ruta o uno de los estados ya estaba ocupado');
+    } finally {
+      setGuardando(false);
     }
-
-    const nuevaRutaId = res.data.ID_ROUTE;
-
-    // 2. Asignar cada estado seleccionado a la ruta
-    await Promise.all(
-      form.estados.map(stateId =>
-        routes.assignState(nuevaRutaId, stateId)
-      )
-    );
-
-    setModalNuevaRuta(false);
-    await cargarDatos();
-    mostrarExito('Ruta creada correctamente');
-  } catch {
-    setErrorModal('Error de conexión');
-  } finally {
-    setGuardando(false);
-  }
 }
 
   // ─── Asignar camión a ruta ───────────────────────────────────────────────

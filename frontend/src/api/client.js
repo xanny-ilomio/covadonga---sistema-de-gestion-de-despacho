@@ -83,6 +83,7 @@ export const routes = {
   getById:     (id)       => request(`/routes/${id}`),
   create:      (data)     => request('/routes', { method: 'POST', body: JSON.stringify(data) }),
   update:      (id, data) => request(`/routes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  getStates:   ()         => request('/states'),
   assignState: (id, stateId) =>
     request(`/routes/${id}/assign-state`, { method: 'PUT', body: JSON.stringify({ state_id: stateId }) }),
 };

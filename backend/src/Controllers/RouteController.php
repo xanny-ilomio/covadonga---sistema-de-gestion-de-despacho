@@ -116,23 +116,43 @@ class RouteController {
             Response::forbidden('Solo despacho puede asignar estados a rutas');
         }
 
-        $body= json_decode(file_get_contents('php://input'), true);
+        $body = json_decode(file_get_contents('php://input'), true);
         $stateId = $body['state_id'] ?? null;
         if (!$stateId) Response::error('state_id es requerido', 422);
 
-        #ruta existe? 
+        # 1. ¿La ruta de destino existe? 
         $stmt = $this->db->prepare("SELECT ID_ROUTE FROM ROUTE WHERE ID_ROUTE = :id");
         $stmt->execute([':id'=> $id]);
         if (!$stmt->fetch()) Response::notFound("Ruta con ID {$id} no encontrada");
 
-        #asignar el estado a la ruta
-        $stmt2 = $this->db->prepare("UPDATE STATE SET ROUTE_FK = :route_id WHERE ID_STATE = :state_id");
-        $stmt2->execute([':route_id' => $id,':state_id' =>$stateId]);
+        # 2. VALIDACIÓN CLAVE: ¿El estado ya pertenece a otra ruta activa?
+        $stmtCheck = $this->db->prepare("
+            SELECT ROUTE_FK, NAME_STATE 
+            FROM STATE 
+            WHERE ID_STATE = :state_id LIMIT 1
+        ");
+        $stmtCheck->execute([':state_id' => $stateId]);
+        $state = $stmtCheck->fetch();
 
-        if ($stmt2->rowCount() === 0) Response::notFound('Estado no encontrado');
+        if ($state) {
+            $currentRoute = $state['ROUTE_FK'];
+            // Si ROUTE_FK tiene un valor asignado (no es NULL, ni vacío, ni '0')
+            if ($currentRoute !== null && $currentRoute !== '' && $currentRoute !== 0 && $currentRoute !== '0') {
+                Response::error("El estado {$state['NAME_STATE']} ya pertenece a otra ruta asignada", 400);
+                return;
+            }
+        } else {
+            Response::notFound('Estado no encontrado');
+            return;
+        }
+
+        # 3. Si está libre, proceder a asignar el estado a la ruta
+        $stmt2 = $this->db->prepare("UPDATE STATE SET ROUTE_FK = :route_id WHERE ID_STATE = :state_id");
+        $stmt2->execute([':route_id' => $id, ':state_id' => $stateId]);
+
         Response::success(null, 'Estado asignado a la ruta correctamente');
     }
-
+    
     #GET /states — lista todos los estados con su ruta asignada
     #El frontend lo usa para el dropdown al configurar rutas
     public function states(): void {

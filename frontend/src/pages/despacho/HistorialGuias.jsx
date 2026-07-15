@@ -3,6 +3,9 @@ import Header from '../../components/Header';
 import { guides, routes } from '../../api/client';
 import styles from '../../styles/HistorialGuias.module.css';
 import guia from '../../../public/assets/pedido.svg';
+import paquete from '../../../public/assets/paquete.svg';
+import truck from '../../../public/assets/truck.svg';
+import peso from '../../../public/assets/peso.svg';
 
 const BASE_URL = 'http://localhost:8888';
 
@@ -89,9 +92,9 @@ function CardGuia({ guia, onDescargar, descargando }) {
           <span className={styles.guiaChofer}>{guia.driver_name}</span>
         </div>
         <div className={styles.guiaDetalle}>
-          <span className={styles.guiaTag}>🚛 {guia.PLATE}</span>
-          <span className={styles.guiaTag}>⚖ {Number(guia.TOTAL_WEIGHT).toFixed(2)} kg</span>
-          <span className={styles.guiaTag}>📦 {guia.total_orders} pedido(s)</span>
+          <span className={styles.guiaTag}><img src={truck} className={styles.imgTag}/> {guia.PLATE}</span>
+          <span className={styles.guiaTag}><img src={peso} className={styles.imgTag}/> {Number(guia.TOTAL_WEIGHT).toFixed(2)} kg</span>
+          <span className={styles.guiaTag}><img src={paquete} className={styles.imgTag}/> {guia.total_orders} pedido(s)</span>
         </div>
       </div>
       <div className={styles.cardDer}>
