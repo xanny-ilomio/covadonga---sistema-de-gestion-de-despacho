@@ -81,12 +81,13 @@ h2 {
     font-size: 20px;
   }
 }
-p, input, button, span, td {
+
+p, input, button, span, td, select {
   margin: 0;
   font-family: var(--text);
 }
 
-label, th{
+label, th,h3{
   font-family: var(--text-b);
 }
 

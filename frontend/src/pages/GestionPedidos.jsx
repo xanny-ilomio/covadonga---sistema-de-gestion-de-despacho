@@ -7,7 +7,7 @@ import styles from '../styles/GestionPedidos.module.css';
 
 const BASE_URL = 'http://localhost:8888';
 
-// Formatea "2026-07-01" → "01/07"
+// Formatea "2026-07-01" a "01/07"
 function formatFecha(fechaStr) {
   if (!fechaStr) return '';
   const [, mes, dia] = fechaStr.split('-');
@@ -17,7 +17,7 @@ function formatFecha(fechaStr) {
 export default function GestionPedidos() {
   const { user } = useAuth();
   const navigate  = useNavigate();
-  const rol       = user?.rol; // 'facturacion' | 'despacho'
+  const rol       = user?.rol;
 
   const [filtro,    setFiltro]    = useState('Pendiente');
   const [pedidos,   setPedidos]   = useState([]);
@@ -73,8 +73,7 @@ export default function GestionPedidos() {
       });
     }
   }
-
-  // ─── Render ───────────────────────────────────────────────────────────────
+ 
   return (
     <div className={styles.appContainer}>
       <Header />

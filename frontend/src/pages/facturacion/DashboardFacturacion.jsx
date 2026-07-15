@@ -144,7 +144,7 @@ export default function DashboardFacturacion() {
               <button className={styles.menuButton} onClick={() => navigate('/facturacion/pedidos')}>
                 <span className={styles.btnIconP}><img src={pedido}/></span> Estado de Pedidos
               </button>
-              <button className={styles.menuButton}>
+              <button className={styles.menuButton}  onClick={() => navigate('/facturacion/estadisticas')}>
                 <span className={styles.btnIcon}><img src={statistics}/></span> Ver Estadísticas
               </button>
             </div>

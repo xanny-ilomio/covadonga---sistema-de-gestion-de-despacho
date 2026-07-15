@@ -7,7 +7,7 @@ import DashboardDespacho from './pages/despacho/DashboardDespacho';
 import RegistrarPedido from './pages/facturacion/RegistrarPedido';
 
 
-// Importaciones lazy — cada página se carga solo cuando se necesita
+// Importaciones lazy: cada pagina se carga solo cuando se necesita
 // Esto hace que el login inicial sea más rápido
 import { lazy, Suspense } from 'react';
 import Dashboard from './pages/Dashboard';
@@ -34,6 +34,8 @@ export default function App() {
   const GestionFlota = lazy(() => import('./pages/despacho/GestionFlota'));
   const GestionRutas = lazy(() => import('./pages/despacho/GestionRutas'));
   const HistorialGuias = lazy(() => import('./pages/despacho/HistorialGuias'));
+  const Estadisticas     = lazy(() => import('./pages/Estadisticas'));
+
   return (
     <AuthProvider>
       <BrowserRouter>
@@ -48,6 +50,7 @@ export default function App() {
                 <Dashboard />
               </ProtectedRoute> }
             />
+        
 
             {/* FACTURACION */}
             <Route path='/facturacion/*' 
@@ -72,6 +75,13 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/facturacion/estadisticas" element={
+              <ProtectedRoute requiredRole="facturacion">
+                <Estadisticas />
+                </ProtectedRoute>
+            } 
+            />
+
 
             {/* DESPACHO */}
             <Route path='/despacho/*' 
@@ -107,6 +117,14 @@ export default function App() {
                 }
               />
               <Route
+                path="/despacho/rutas"
+                element={
+                  <ProtectedRoute requiredRole="despacho">
+                    <GestionRutas />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/despacho/guias"
                 element={
                   <ProtectedRoute requiredRole="despacho">
@@ -114,8 +132,14 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route path="/despacho/estadisticas" element={
+                <ProtectedRoute requiredRole="despacho">
+                  <Estadisticas />
+                  </ProtectedRoute>
+              } 
+              />
 
-            {/* Cualquier ruta no encontrada → login */}
+            {/* Cualquier ruta no encontrada lleva al login */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>

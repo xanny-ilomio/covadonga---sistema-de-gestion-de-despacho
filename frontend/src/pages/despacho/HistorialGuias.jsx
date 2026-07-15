@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Header from '../../components/Header';
 import { guides, routes } from '../../api/client';
 import styles from '../../styles/HistorialGuias.module.css';
+import guia from '../../../public/assets/pedido.svg';
 
 const BASE_URL = 'http://localhost:8888';
 
@@ -220,6 +221,32 @@ export default function HistorialGuias() {
     }
   }
 
+  async function descargarHistorial() {
+  try {
+    const token  = localStorage.getItem('token');
+    const params = new URLSearchParams({ month: mesActual + 1, year: anioActual });
+    if (rutaFiltro) params.append('route_id', rutaFiltro);
+
+    const res = await fetch(`${BASE_URL}/guides/export?${params}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (res.ok) {
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href     = url;
+      link.download = `historial-${MESES[mesActual].toLowerCase()}-${anioActual}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    }
+  } catch (err) {
+    console.error('Error exportando historial:', err);
+  }
+}
+
   // Estadísticas del mes actual
   const guiasMes   = todasGuias.filter(g => {
     const [y, m] = g.EMISSION_DATE.split('-').map(Number);
@@ -300,13 +327,23 @@ export default function HistorialGuias() {
 
           <div className={styles.contenidoHeader}>
             <h1 className={styles.titulo}>Historial de Guías</h1>
-            <input
-              type="text"
-              placeholder="Buscar por guía, chofer o ruta..."
-              value={busqueda}
-              onChange={e => setBusqueda(e.target.value)}
-              className={styles.buscador}
-            />
+            <div className={styles.headerAcciones}>
+              <button
+                className={styles.btnExportar}
+                onClick={descargarHistorial}
+                disabled={guiasFiltradas.length === 0}
+                title={`Descargar ${guiasFiltradas.length} guía(s) de ${MESES[mesActual]}`}
+              >
+                ⬇ Exportar {guiasFiltradas.length > 0 ? `(${guiasFiltradas.length})` : ''}
+              </button>
+              <input
+                type="text"
+                placeholder="Buscar por guía, chofer o ruta..."
+                value={busqueda}
+                onChange={e => setBusqueda(e.target.value)}
+                className={styles.buscador}
+              />
+            </div>
           </div>
 
           <div className={styles.lista}>
@@ -317,8 +354,8 @@ export default function HistorialGuias() {
               </div>
             ) : guiasFiltradas.length === 0 ? (
               <div className={styles.estadoVacio}>
-                <span className={styles.estadoIcono}>📋</span>
-                <p>No hay guías para {diaSelec ? `el ${diaSelec}/` : ''}{MESES[mesActual].toLowerCase()} {anioActual}</p>
+                <img src={guia} className={styles.estadoIcono}/>
+                <p>No hay guías para {diaSelec ? `el ${diaSelec} de ` : ''}{MESES[mesActual].toLowerCase()} {anioActual}</p>
                 {(diaSelec || rutaFiltro || busqueda) && (
                   <button
                     className={styles.btnLimpiarInline}

@@ -42,6 +42,8 @@
   text-transform: uppercase;
   letter-spacing: .5px;
   margin-bottom: 12px;
+  font-family: var(--text-b);
+
 }
 .resumenStats {
   display: flex;
@@ -76,6 +78,7 @@
   border: 0.5px solid #f0f0f0;
   border-radius: 14px;
   padding: 12px;
+  /* font-family: var(--text); */
 }
 .calHeader {
   display: flex;
@@ -87,6 +90,8 @@
   font-size: 13px;
   font-weight: 700;
   color: #1f2937;
+  font-family: var(--text-b);
+
 }
 .calNav {
   background: transparent;
@@ -113,6 +118,8 @@
   text-align: center;
   padding: 4px 0;
   text-transform: uppercase;
+  font-family: var(--text-b);
+
 }
 .calDia {
   aspect-ratio: 1;
@@ -127,10 +134,11 @@
   position: relative;
   transition: background 150ms, color 150ms;
   gap: 1px;
+  font-family: var(--text);
 }
 .calDia:hover:not(.calDiaVacio) { background: #FEF2F2; color: #B91C1C; }
-.calDiaVacio { cursor: default; }
-.calDiaConGuia { font-weight: 600; color: #1f2937; }
+.calDiaVacio { cursor: default;}
+.calDiaConGuia { font-weight: 600; color: #1f2937; font-family: var(--text-b);}
 .calDiaSeleccionado {
   background: #B91C1C !important;
   color: #fff !important;
@@ -197,6 +205,7 @@
 }
 .buscador {
   flex: 1;
+  min-width: 220px;
   max-width: 320px;
   padding: 9px 14px;
   border: 0.5px solid #e5e7eb;
@@ -232,7 +241,7 @@
   gap: 10px;
   color: #9ca3af;
 }
-.estadoIcono { font-size: 36px; }
+.estadoIcono { height: 4rem;}
 .estadoVacio p { font-size: 14px; margin: 0; }
 .btnLimpiarInline {
   background: transparent;
@@ -286,7 +295,7 @@
   font-size: 15px;
   font-weight: 700;
   color: #B8860B;
-  font-family: monospace;
+  font-family: var(--heading);
 }
 .guiaMeta {
   display: flex;
@@ -337,3 +346,26 @@
 .btnDescargar:hover:not(:disabled)  { background: #991B1B; }
 .btnDescargar:active:not(:disabled) { transform: scale(0.95); }
 .btnDescargar:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.headerAcciones {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btnExportar {
+  background: #B91C1C;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 150ms, transform 120ms;
+  flex-shrink: 0;
+}
+.btnExportar:hover:not(:disabled)  { opacity: 0.88; }
+.btnExportar:active:not(:disabled) { transform: scale(0.97); }
+.btnExportar:disabled { opacity: 0.4; cursor: not-allowed; }

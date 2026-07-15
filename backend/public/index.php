@@ -39,6 +39,7 @@ $classMap=[
     'TruckController'  => $basePath . 'controllers/TruckController.php',
     'DriverController' => $basePath . 'controllers/DriverController.php',
     'StatsController'   => $basePath . 'controllers/StatsController.php',
+    'StatsExportController' => $basePath . 'controllers/StatsExportController.php',
 ];
 
 spl_autoload_register(function (string $class) use ($classMap){
@@ -115,6 +116,10 @@ match(true) {
         => (new RouteController())->update($id),
     $resource === 'routes' && $method === 'PUT'  && $id !== null && $subResource === 'assign-state'
         => (new RouteController())->assignState($id),
+
+    // Exportar historial PDF
+    $resource === 'guides' && $method === 'GET' && ($parts[1] ?? '') === 'export'
+        => (new GuideController())->export(),
  
     // Guides
     $resource === 'guides' && $method === 'GET' && $id !== null && $subResource === 'pdf'
@@ -136,6 +141,10 @@ match(true) {
     $resource === 'drivers' && $method === 'POST'                   => (new DriverController())->store(),
     $resource === 'drivers' && $method === 'PUT'    && $id !== null => (new DriverController())->update($id),
     $resource === 'drivers' && $method === 'DELETE' && $id !== null => (new DriverController())->destroy($id),
+
+    // Stats export PDF
+    $resource === 'stats' && $method === 'GET' && ($parts[1] ?? '') === 'export'
+        => (new StatsExportController())->export(),
 
     // Stats
     $resource === 'stats' && $method === 'GET' => (new StatsController())->index(),

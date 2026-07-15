@@ -1,0 +1,231 @@
+/* ── Raíz ─────────────────────────────────────────────────────────────────── */
+.appContainer {
+  height: 100vh;
+  width: 100vw;
+  background: #F8F7F4;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 24px 0;
+  overflow: hidden;
+}
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+.titulo {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #B91C1C;
+  margin: 0;
+}
+.rolBadge {
+  background: #FEF2F2;
+  color: #B91C1C;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 0.5px solid rgba(185,28,28,0.2);
+}
+
+/* ── Contenido scrollable ────────────────────────────────────────────────── */
+.contenido {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 24px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.contenido::-webkit-scrollbar { display: none; }
+
+/* ── Estado vacío ────────────────────────────────────────────────────────── */
+.estadoVacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  gap: 10px;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+/* ── KPI Grid ────────────────────────────────────────────────────────────── */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.metricaCard {
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.metricaIcono {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.metricaInfo { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.metricaValor { font-size: 22px; font-weight: 800; line-height: 1; }
+.metricaLabel { font-size: 12px; color: #6b7280; }
+.metricaSub   { font-size: 11px; color: #9ca3af; }
+
+/* ── Dos columnas ────────────────────────────────────────────────────────── */
+.dosColumnas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ── Sección ─────────────────────────────────────────────────────────────── */
+.seccion {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.seccionTitulo {
+  font-size: 12px;
+  font-weight: 700;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin: 0 0 14px;
+}
+.sinDatos { font-size: 13px; color: #d1d5db; text-align: center; padding: 20px 0; }
+
+/* ── Barras horizontales ─────────────────────────────────────────────────── */
+.barrasLista { display: flex; flex-direction: column; gap: 10px; }
+.barraItem   { display: flex; flex-direction: column; gap: 4px; }
+.barraLabelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.barraLabel { font-size: 12px; color: #374151; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.barraValor { font-size: 12px; color: #9ca3af; flex-shrink: 0; }
+.barraTrack {
+  height: 6px;
+  background: #f3f4f6;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.barraFill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 600ms cubic-bezier(0.23,1,0.32,1);
+  min-width: 4px;
+}
+
+/* ── Estado de pedidos ───────────────────────────────────────────────────── */
+.estadoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.estadoCard {
+  background: #FAFAFA;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+.estadoIcono { font-size: 18px; }
+.estadoNum   { display: block; font-size: 20px; font-weight: 800; line-height: 1; }
+.estadoLabel { display: block; font-size: 11px; color: #9ca3af; margin-top: 2px; }
+
+/* ── Ranking ─────────────────────────────────────────────────────────────── */
+.rankingLista { display: flex; flex-direction: column; gap: 8px; }
+.rankingItem  {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: #FAFAFA;
+  border-radius: 8px;
+}
+.rankingPos    { font-size: 13px; font-weight: 800; min-width: 24px; }
+.rankingNombre { flex: 1; font-size: 13px; color: #374151; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rankingValor  { font-size: 12px; color: #9ca3af; flex-shrink: 0; }
+.rankingSub    { font-size: 11px; color: #9ca3af; }
+
+/* ── Peso display (despacho) ─────────────────────────────────────────────── */
+.pesoDisplay {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.pesoNum {
+  font-size: 48px;
+  font-weight: 800;
+  color: #B91C1C;
+  line-height: 1;
+}
+.pesoSufijo { font-size: 20px; color: #9ca3af; }
+
+.fleetRow {
+  display: flex;
+  gap: 20px;
+  padding-top: 12px;
+  border-top: 0.5px solid #f0f0f0;
+}
+.fleetItem { display: flex; align-items: center; gap: 8px; }
+.fleetNum  { font-size: 22px; font-weight: 700; color: #1f2937; }
+.fleetLabel{ font-size: 12px; color: #9ca3af; }
+
+/* ── Guías en stats despacho ─────────────────────────────────────────────── */
+.guiaNumStat  { font-size: 12px; font-weight: 700; color: #B8860B; font-family: monospace; min-width: 80px; }
+.guiaInfoStat { flex: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.guiaMetaStat { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; flex-shrink: 0; }
+.rankingSub2  { font-size: 10px; color: #9ca3af; }
+
+
+/* Períodos */
+.periodos { display: flex; gap: 4px; }
+.periodoBtn {
+  padding: 6px 12px; border-radius: 8px;
+  border: 0.5px solid #e5e7eb;
+  background: #fff; color: #6b7280;
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: all 150ms;
+}
+.periodoBtn:hover { border-color: #B91C1C; color: #B91C1C; }
+.periodoActivo {
+  background: #B91C1C; color: #fff;
+  border-color: #B91C1C;
+}
+
+.btnExportar {
+  background: #1f2937; color: #fff; border: none;
+  border-radius: 8px; padding: 7px 14px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: opacity 150ms;
+}
+.btnExportar:hover:not(:disabled) { opacity: 0.85; }
+.btnExportar:disabled { opacity: 0.4; cursor: not-allowed; }

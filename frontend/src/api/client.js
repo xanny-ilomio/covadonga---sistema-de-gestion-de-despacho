@@ -97,6 +97,14 @@ export const guides = {
     const token = localStorage.getItem('token');
     window.open(`${BASE_URL}/guides/${id}/pdf?token=${token}`, '_blank');
   },
+  export: (month, year, routeId) => {
+    const token  = localStorage.getItem('token');
+    const params = new URLSearchParams({ month, year });
+    if (routeId) params.append('route_id', routeId);
+    return fetch(`${BASE_URL}/guides/export?${params}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
 };
 
 // ─── Camiones y conductores ───────────────────────────────────────────────────
@@ -116,5 +124,5 @@ export const drivers = {
 
 // ─── Estadísticas ─────────────────────────────────────────────────────────────
 export const stats = {
-  get: () => request('/stats'),
+  get: (period = 30) => request(`/stats?period=${period}`),
 };

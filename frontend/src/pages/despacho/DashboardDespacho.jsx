@@ -10,6 +10,12 @@ import rutasIcon from '../../../public/assets/route.svg';
 import styles from '../../styles/DashboardDespacho.module.css';
 
 const INTERVALO_MS   = 60000;
+function formatFecha(fechaStr) {
+  if (!fechaStr) return '';
+  const [, mes, dia] = fechaStr.split('-');
+  return `${dia}/${mes}`;
+}
+
 
 export default function DashboardDespacho() {
     const navigate = useNavigate();
@@ -106,7 +112,7 @@ export default function DashboardDespacho() {
                             <div className={styles.cardInfoGroup} onClick={() => navigate(`/despacho/pedido/${pedido.ID_ORDER}`)}>
                                 <span className={styles.orderNumber}>#{String(pedido.ID_ORDER).padStart(5,'0')}</span>
                                 <span className={styles.clientNameMin}>{pedido.NAME_CLIENT}</span>
-                                <span className={styles.dateTag}>{pedido.CREATED_AT ? new Date(pedido.CREATED_AT).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }) : '--/--'}</span>
+                                <span className={styles.dateTag}>{formatFecha(pedido.DATE_ORDERED)}</span>
                             </div>
                         </div>
                         ))

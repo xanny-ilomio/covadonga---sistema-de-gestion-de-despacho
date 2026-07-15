@@ -363,7 +363,7 @@ function PopupExito({ mensaje }) {
     <div className={styles.overlay}>
       <div className={styles.popup}>
         <div className={styles.successIcon}>✓</div>
-        <h2>¡Guía Generada!</h2>
+        <h2>Datos Registrados</h2>
         <p>{mensaje}</p>
       </div>
     </div>
@@ -523,7 +523,7 @@ export default function GestionRutas() {
       {/* MODAL NUEVA RUTA */}
       {modalNuevaRuta && (
         <ModalRuta
-          listaEstados={listaEstados}  // ← agregar esta prop
+          listaEstados={listaEstados}
           onGuardar={crearRuta}
           onCerrar={() => setModalNuevaRuta(false)}
           guardando={guardando}
